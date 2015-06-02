@@ -20,7 +20,7 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Apache HTTP Components -->
+		<!-- Apache HTTP Client -->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
