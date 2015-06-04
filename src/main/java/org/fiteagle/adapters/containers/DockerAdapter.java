@@ -9,9 +9,18 @@ public class DockerAdapter extends AbstractAdapter{
 	
 
 	@Override
-	public Model createInstance(String arg0, Model arg1)
+	public Model createInstance(String uri, Model requestModel)
 			throws ProcessingException, InvalidRequestException {
 		// TODO Auto-generated method stub
+		
+		Resource requestedCont = requestModel.getResource(uri);
+		
+		//TODO:	rdfProp.image enter description
+		//		what do we need except for image
+		String image = requestedCont.getProperty(rdfProp.image);
+		
+		//DockerClient.create(image) or something
+		
 		return null;
 	}
 
