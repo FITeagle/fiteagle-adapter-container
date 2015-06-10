@@ -1,12 +1,15 @@
 package org.fiteagle.adapters.containers.docker.internal;
 
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.net.URL;
 
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 
-public class RequestBuilder {
+/**
+ * Use this to build HTTP request objects which can be sent to an API endpoint.
+ */
+public class RequestBuilder {	
 	private String scheme = "http";
 	private String hostname;
 	private int port = 80;
@@ -44,7 +47,7 @@ public class RequestBuilder {
 	}
 	
 	/**
-	 * Create and prepare a URLBuilder.
+	 * Create and prepare a URIBuilder.
 	 */
 	private URIBuilder prepareBuilder() {
 		return
@@ -55,24 +58,51 @@ public class RequestBuilder {
 	}
 	
 	/**
-	 * Build the URL for a version request.
+	 * Retrieve version information.
 	 */
-	public URL version() throws MalformedURLException, URISyntaxException {
+	public HttpGet version() throws URISyntaxException {
 		return
-			prepareBuilder()
-				.setPath("/version")
-				.build()
-				.toURL();
+			new HttpGet(prepareBuilder()
+			            .setPath("/version")
+			            .build());
 	}
 	
 	/**
-	 * Build the URL for a information request.
+	 * Retrieve general information.
 	 */
-	public URL info() throws MalformedURLException, URISyntaxException {
+	public HttpGet info() throws URISyntaxException {
 		return
-			prepareBuilder()
-				.setPath("/info")
-				.build()
-				.toURL();
+			new HttpGet(prepareBuilder()
+			            .setPath("/info")
+			            .build());
+	}
+	
+	/**
+	 * List containers.
+	 */
+	public HttpGet listContainers(boolean all) throws URISyntaxException {
+		return
+			new HttpGet(prepareBuilder()
+			            .setPath("/containers/json")
+			            .setParameter("all", all ? "1" : "0")
+			            .setParameter("size", "1")
+			            .build());
+	}
+	
+	/**
+	 * Create a container.
+	 */
+	public HttpPost createContainer(CreateContainerInfo info)
+		throws URISyntaxException
+	{
+		HttpPost request =
+			new HttpPost(prepareBuilder()
+			             .setPath("/containers/create")
+			             .build());
+		
+		// Attach payload
+		request.setEntity(info.toEntity());
+		
+		return request;
 	}
 }
