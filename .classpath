@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry excluding="org/fiteagle/adapters/containers/DockerAdapter.java|org/fiteagle/adapters/containers/dm/" kind="src" path="src/main/java"/>
+	<classpathentry kind="src" path="src/test/java"/>
 	<classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/httpcomponents/httpclient/4.4.1/httpclient-4.4.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/httpcomponents/httpcore/4.4.1/httpcore-4.4.1.jar"/>
