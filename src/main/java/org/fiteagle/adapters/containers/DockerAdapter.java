@@ -5,22 +5,11 @@ import org.fiteagle.abstractAdapter.AbstractAdapter;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 
-public class DockerAdapter extends AbstractAdapter{
-	
-
+public class DockerAdapter extends AbstractAdapter {
 	@Override
-	public Model createInstance(String uri, Model requestModel)
+	public Model createInstance(String arg0, Model arg1)
 			throws ProcessingException, InvalidRequestException {
 		// TODO Auto-generated method stub
-		
-		Resource requestedCont = requestModel.getResource(uri);
-		
-		//TODO:	rdfProp.image enter description
-		//		what do we need except for image
-		String image = requestedCont.getProperty(rdfProp.image);
-		
-		//DockerClient.create(image) or something
-		
 		return null;
 	}
 
@@ -28,7 +17,7 @@ public class DockerAdapter extends AbstractAdapter{
 	public void deleteInstance(String arg0) throws InstanceNotFoundException,
 			InvalidRequestException, ProcessingException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -66,13 +55,13 @@ public class DockerAdapter extends AbstractAdapter{
 	@Override
 	public void refreshConfig() throws ProcessingException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void updateAdapterDescription() throws ProcessingException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -81,5 +70,4 @@ public class DockerAdapter extends AbstractAdapter{
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }
