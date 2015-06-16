@@ -1,5 +1,6 @@
 package org.fiteagle.adapters.containers.docker.internal;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 
 import org.apache.http.client.methods.HttpGet;
@@ -9,11 +10,11 @@ import org.apache.http.client.utils.URIBuilder;
 /**
  * Use this to build HTTP request objects which can be sent to an API endpoint.
  */
-public class RequestBuilder {	
+public class RequestBuilder {
 	private String scheme = "http";
 	private String hostname;
 	private int port = 80;
-	
+
 	/**
 	 * Instantiate a request builder which targets an endpoint at `scheme://hostname:port`.
 	 */
@@ -22,7 +23,7 @@ public class RequestBuilder {
 		this.hostname = hostname;
 		this.port = port;
 	}
-	
+
 	/**
 	 * Instantiate a request builder which targets an endpoint at `scheme://hostname:80`.
 	 */
@@ -30,7 +31,7 @@ public class RequestBuilder {
 		this.scheme = scheme;
 		this.hostname = hostname;
 	}
-	
+
 	/**
 	 * Instantiate a request builder which targets an endpoint at `http://hostname:port`.
 	 */
@@ -38,14 +39,14 @@ public class RequestBuilder {
 		this.hostname = hostname;
 		this.port = port;
 	}
-	
+
 	/**
 	 * Instantiate a request builder which targets an endpoint at `http://hostname:80`.
 	 */
 	public RequestBuilder(String hostname) {
 		this.hostname = hostname;
 	}
-	
+
 	/**
 	 * Create and prepare a URIBuilder.
 	 */
@@ -56,7 +57,7 @@ public class RequestBuilder {
 				.setHost(hostname)
 				.setPort(port);
 	}
-	
+
 	/**
 	 * Retrieve version information.
 	 */
@@ -66,7 +67,7 @@ public class RequestBuilder {
 			            .setPath("/version")
 			            .build());
 	}
-	
+
 	/**
 	 * Retrieve general information.
 	 */
@@ -76,7 +77,7 @@ public class RequestBuilder {
 			            .setPath("/info")
 			            .build());
 	}
-	
+
 	/**
 	 * List containers.
 	 */
@@ -88,21 +89,21 @@ public class RequestBuilder {
 			            .setParameter("size", "1")
 			            .build());
 	}
-	
+
 	/**
 	 * Create a container.
 	 */
 	public HttpPost createContainer(CreateContainerInfo info)
-		throws URISyntaxException
+		throws URISyntaxException, UnsupportedEncodingException
 	{
 		HttpPost request =
 			new HttpPost(prepareBuilder()
 			             .setPath("/containers/create")
 			             .build());
-		
+
 		// Attach payload
 		request.setEntity(info.toEntity());
-		
+
 		return request;
 	}
 }
