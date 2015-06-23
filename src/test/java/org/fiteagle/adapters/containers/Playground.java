@@ -13,11 +13,15 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.fiteagle.adapters.containers.docker.internal.CreateContainerInfo;
+import org.fiteagle.adapters.containers.docker.internal.DockerException;
 import org.fiteagle.adapters.containers.docker.internal.RequestBuilder;
+import org.fiteagle.adapters.containers.docker.internal.ResponseParser;
 
 public class Playground {
-	public static void main(String[] args) throws URISyntaxException, ClientProtocolException, IOException {
-		CreateContainerInfo cci = new CreateContainerInfo("mycontainer", "root", "ubuntu:latest");
+	public static void main(String[] args)
+			throws URISyntaxException, ClientProtocolException, IOException, DockerException
+	{
+		CreateContainerInfo cci = new CreateContainerInfo("mycontainer123123", "ubuntsäkahju");
 
 		cci.putEnvironment("hello", "world");
 		cci.putLabel("how", "wonderful");
@@ -38,12 +42,8 @@ public class Playground {
 		// Clear container
 		CloseableHttpResponse httpResponse = httpClient.execute(request);
 
-		BufferedReader breader = new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent()));
-
-		String line = null;
-		while ((line = breader.readLine()) != null) {
-			System.out.println(line);
-		}
+		String createdContainerID = ResponseParser.createContainer(httpResponse);
+		System.out.println("Created container " + createdContainerID);
 
 		httpResponse.close();
 
@@ -51,7 +51,11 @@ public class Playground {
 		HttpGet httpListRequest = requestBuilder.listContainers(true);
 		CloseableHttpResponse httpListResponse = httpClient.execute(httpListRequest);
 
-		BufferedReader breader2 = new BufferedReader(new InputStreamReader(httpListResponse.getEntity().getContent()));
+		BufferedReader breader2 = new BufferedReader(
+			new InputStreamReader(httpListResponse.getEntity().getContent())
+		);
+
+		String line = null;
 		while ((line = breader2.readLine()) != null) {
 			System.out.println(line);
 		}
