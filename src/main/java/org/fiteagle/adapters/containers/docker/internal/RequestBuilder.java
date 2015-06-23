@@ -101,6 +101,8 @@ public class RequestBuilder {
 			             .setPath("/containers/create")
 			             .build());
 
+		request.addHeader("Content-Type", "application/json");
+
 		// Attach payload
 		request.setEntity(info.toEntity());
 
