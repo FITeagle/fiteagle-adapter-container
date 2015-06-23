@@ -27,7 +27,7 @@ public class CreateContainerInfo {
 	/**
 	 * User inside the container
 	 */
-	public String user;
+	public String user = null;
 
 	/**
 	 * Container image name
@@ -64,6 +64,10 @@ public class CreateContainerInfo {
 		workingDirectory = null;
 
 		labels = new JsonObject();
+	}
+
+	public CreateContainerInfo(String n, String i) {
+		this(n, null, i);
 	}
 
 	/**
@@ -162,10 +166,14 @@ public class CreateContainerInfo {
 
 		resultObject.put("Hostname", host);
 		resultObject.put("Domainname", domain);
-		resultObject.put("User", user);
+
+		if (user != null)
+			resultObject.put("User", user);
 
 		resultObject.put("Env", environment);
 		resultObject.put("Cmd", command);
+
+		resultObject.put("Image", image);
 
 		if (workingDirectory != null)
 			resultObject.put("WorkingDir", workingDirectory);
