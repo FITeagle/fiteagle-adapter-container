@@ -32,30 +32,35 @@ public abstract class ResponseParser {
 		return containerID;
 	}
 
-	private static ContainerInfo extractContainerInfo(JsonObject jsonContainerInfo)
+	private static ContainerInfo extractContainerInfo(JsonValue jsonContainerInfo)
 		throws DockerException
 	{
-		if (
-			jsonContainerInfo == null ||
-			!jsonContainerInfo.hasKey("Id") ||
-			!jsonContainerInfo.hasKey("Image") ||
-			!jsonContainerInfo.hasKey("Command") ||
-			!jsonContainerInfo.hasKey("Created") ||
-			!jsonContainerInfo.hasKey("Status") ||
-			!jsonContainerInfo.hasKey("Ports") ||
-			!jsonContainerInfo.hasKey("SizeRw") ||
-			!jsonContainerInfo.hasKey("SizeRootFs")
-		) {
-			throw new DockerException("Unexpected result schema");
-		}
+		// Check type
+		if (jsonContainerInfo == null || !jsonContainerInfo.isObject())
+			throw new DockerException("Container info must be an object");
 
-		// TODO: Construct ContainerInfo using values from the given JSON object
-		return new ContainerInfo();
+		JsonObject containerInfo = jsonContainerInfo.getAsObject();
+
+		// Validate schema
+		if (!containerInfo.hasKey("Id") || !containerInfo.hasKey("Image"))
+			throw new DockerException("Container info does not match expected schema");
+
+		// Validate 'Image' field
+		JsonValue jsonImage = containerInfo.get("Image");
+		if (!jsonImage.isString())
+			throw new DockerException("Container info field 'Image' must be a String");
+
+		return new ContainerInfo(
+			extractContainerID(containerInfo.get("Id")),
+			jsonImage.getAsString().value()
+		);
 	}
 
 	/**
 	 */
-	public static LinkedList<ContainerInfo> listContainers(HttpResponse response) throws DockerException {
+	public static LinkedList<ContainerInfo> listContainers(HttpResponse response)
+		throws DockerException
+	{
 		if (response.getStatusLine().getStatusCode() != 200)
 			throw new DockerException("Failed to list containers");
 
@@ -76,10 +81,7 @@ public abstract class ResponseParser {
 		LinkedList<ContainerInfo> containers = new LinkedList<ContainerInfo>();
 
 		for (JsonValue containerValue: jsonResult.getAsArray()) {
-			if (!containerValue.isObject())
-				continue;
-
-			containers.add(extractContainerInfo(containerValue.getAsObject()));
+			containers.add(extractContainerInfo(containerValue));
 		}
 
 		return containers;
