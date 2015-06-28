@@ -1,5 +1,7 @@
 package org.fiteagle.adapters.containers.docker.internal;
 
+import java.util.LinkedList;
+
 import org.apache.http.HttpResponse;
 import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.atlas.json.JsonObject;
@@ -28,6 +30,59 @@ public abstract class ResponseParser {
 		}
 
 		return containerID;
+	}
+
+	private static ContainerInfo extractContainerInfo(JsonObject jsonContainerInfo)
+		throws DockerException
+	{
+		if (
+			jsonContainerInfo == null ||
+			!jsonContainerInfo.hasKey("Id") ||
+			!jsonContainerInfo.hasKey("Image") ||
+			!jsonContainerInfo.hasKey("Command") ||
+			!jsonContainerInfo.hasKey("Created") ||
+			!jsonContainerInfo.hasKey("Status") ||
+			!jsonContainerInfo.hasKey("Ports") ||
+			!jsonContainerInfo.hasKey("SizeRw") ||
+			!jsonContainerInfo.hasKey("SizeRootFs")
+		) {
+			throw new DockerException("Unexpected result schema");
+		}
+
+		// TODO: Construct ContainerInfo using values from the given JSON object
+		return new ContainerInfo();
+	}
+
+	/**
+	 */
+	public static LinkedList<ContainerInfo> listContainers(HttpResponse response) throws DockerException {
+		if (response.getStatusLine().getStatusCode() != 200)
+			throw new DockerException("Failed to list containers");
+
+		JsonObject jsonResult = null;
+
+		// Obtain resulting JSON object
+		try {
+			jsonResult = JSON.parse(response.getEntity().getContent());
+		} catch (Exception e) {
+			throw new DockerException(e);
+		}
+
+		// Validate the result schema
+		if (jsonResult == null || jsonResult.isArray()) {
+			throw new DockerException("Unexpected result schema");
+		}
+
+		LinkedList<ContainerInfo> containers = new LinkedList<ContainerInfo>();
+
+		for (JsonValue containerValue: jsonResult.getAsArray()) {
+			if (!containerValue.isObject())
+				continue;
+
+			containers.add(extractContainerInfo(containerValue.getAsObject()));
+		}
+
+		return containers;
 	}
 
 	/**
