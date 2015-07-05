@@ -4,7 +4,14 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class ContainerInfo {
+	/**
+	 * Container ID
+	 */
 	public final String id;
+
+	/**
+	 * Container name
+	 */
 	public final String image;
 
 	private ContainerInfo(String containerID, String containerImage) {
@@ -12,6 +19,9 @@ public class ContainerInfo {
 		image = containerImage;
 	}
 
+	/**
+	 * Construct a container info using a JSON object.
+	 */
 	public static ContainerInfo fromJson(JsonElement value)
 		throws DockerException
 	{

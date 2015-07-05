@@ -9,11 +9,17 @@ public class DockerClient {
 	private RequestBuilder requestBuilder;
 	private CloseableHttpClient httpClient;
 
+	/**
+	 * Construct a Docker client for an instance listening at ´tcp://hostname:port´.
+	 */
 	public DockerClient(String hostname, int port) {
 		requestBuilder = new RequestBuilder(hostname, port);
 		httpClient = HttpClients.createDefault();
 	}
 
+	/**
+	 * Create a new container using the given information.
+	 */
 	public String createContainer(CreateContainerInfo cci)
 		throws DockerException
 	{
@@ -26,6 +32,10 @@ public class DockerClient {
 		}
 	}
 
+	/**
+	 * List containers.
+	 * @param all Specify whether to list all containers or not
+	 */
 	public LinkedList<ContainerInfo> listContainers(boolean all)
 		throws DockerException
 	{
@@ -38,6 +48,13 @@ public class DockerClient {
 		}
 	}
 
+	/**
+	 * Delete a specific container.
+	 * @param containerID Container identifier
+	 * @param deleteVolume Delete the volume attached to the container
+	 * @param force Kill the container before removing it
+	 * @return Whether the container has been deleted or not
+	 */
 	public boolean deleteContainer(String containerID, boolean deleteVolume, boolean force)
 		throws DockerException
 	{
