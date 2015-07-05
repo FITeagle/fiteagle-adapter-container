@@ -20,7 +20,7 @@ public class DockerClient {
 	/**
 	 * Create a new container using the given information.
 	 */
-	public String createContainer(CreateContainerInfo cci)
+	public String createContainer(ContainerConfiguration cci)
 		throws DockerException
 	{
 		try {

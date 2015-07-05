@@ -6,14 +6,16 @@ import java.util.TreeMap;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.entity.StringEntity;
-import org.apache.jena.atlas.json.JsonArray;
-import org.apache.jena.atlas.json.JsonObject;
-import org.apache.jena.atlas.json.JsonValue;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 /**
  * Capsulates the information required to create a container.
  */
-public class CreateContainerInfo {
+public class ContainerConfiguration {
 	/**
 	 * Container host name
 	 */
@@ -42,7 +44,7 @@ public class CreateContainerInfo {
 	/**
 	 * Working directory for the commands to be executed in
 	 */
-	public String workingDirectory;
+	public String workingDirectory = null;
 
 	/**
 	 * Command to be executed inside the container
@@ -54,27 +56,20 @@ public class CreateContainerInfo {
 	 */
 	private JsonObject labels;
 
-	public CreateContainerInfo(String n, String u, String i) {
-		host = domain = n;
-		user = u;
-		image = i;
+	public ContainerConfiguration(String containerName, String containerImage) {
+		host = domain = containerName;
+		image = containerImage;
 
 		environment = new JsonObject();
 		command = new JsonArray();
-		workingDirectory = null;
-
 		labels = new JsonObject();
-	}
-
-	public CreateContainerInfo(String n, String i) {
-		this(n, null, i);
 	}
 
 	/**
 	 * Set an environment variable.
 	 */
 	public void putEnvironment(String name, String value) {
-		environment.put(name, value);
+		environment.addProperty(name, value);
 	}
 
 	/**
@@ -92,8 +87,8 @@ public class CreateContainerInfo {
 
 		// This seems cumbersome, there should be another way of copying
 		// the key-value associations.
-		for (Entry<String, JsonValue> pair: environment.entrySet()) {
-			map.put(pair.getKey(), pair.getValue().getAsString().value());
+		for (Entry<String, JsonElement> pair: environment.entrySet()) {
+			map.put(pair.getKey(), pair.getValue().getAsString());
 		}
 
 		return map;
@@ -103,17 +98,17 @@ public class CreateContainerInfo {
 	 * Remove all environment variables.
 	 */
 	public void clearEnvironment() {
-		environment.clear();
+		environment = new JsonObject();
 	}
 
 	/**
 	 * Set the command which will be executed inside the container.
 	 */
 	public void setCommand(String[] cmd) {
-		command.clear();
+		command = new JsonArray();
 
 		for (String c: cmd) {
-			command.add(c);
+			command.add(new JsonPrimitive(c));
 		}
 	}
 
@@ -125,7 +120,7 @@ public class CreateContainerInfo {
 	 * Tag the container with a label
 	 */
 	public void putLabel(String key, String value) {
-		labels.put(key, value);
+		labels.addProperty(key, value);
 	}
 
 	/**
@@ -143,8 +138,8 @@ public class CreateContainerInfo {
 
 		// This seems cumbersome, there should be another way of copying
 		// the key-value associations.
-		for (Entry<String, JsonValue> pair: labels.entrySet()) {
-			map.put(pair.getKey(), pair.getValue().getAsString().value());
+		for (Entry<String, JsonElement> pair: labels.entrySet()) {
+			map.put(pair.getKey(), pair.getValue().getAsString());
 		}
 
 		return map;
@@ -154,7 +149,7 @@ public class CreateContainerInfo {
 	 * Remove all labels which are associated with the container.
 	 */
 	public void clearLabels() {
-		labels.clear();
+		labels = new JsonObject();
 	}
 
 	/**
@@ -164,19 +159,19 @@ public class CreateContainerInfo {
 	public JsonObject toJsonObject() {
 		JsonObject resultObject = new JsonObject();
 
-		resultObject.put("Hostname", host);
-		resultObject.put("Domainname", domain);
+		resultObject.addProperty("Hostname", host);
+		resultObject.addProperty("Domainname", domain);
 
 		if (user != null)
-			resultObject.put("User", user);
+			resultObject.addProperty("User", user);
 
-		resultObject.put("Env", environment);
-		resultObject.put("Cmd", command);
+		resultObject.add("Env", environment);
+		resultObject.add("Cmd", command);
 
-		resultObject.put("Image", image);
+		resultObject.addProperty("Image", image);
 
 		if (workingDirectory != null)
-			resultObject.put("WorkingDir", workingDirectory);
+			resultObject.addProperty("WorkingDir", workingDirectory);
 
 		return resultObject;
 	}

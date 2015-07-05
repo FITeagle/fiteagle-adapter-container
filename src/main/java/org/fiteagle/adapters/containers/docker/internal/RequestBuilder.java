@@ -94,7 +94,7 @@ public class RequestBuilder {
 	/**
 	 * Create a container.
 	 */
-	public HttpPost createContainer(CreateContainerInfo info)
+	public HttpPost createContainer(ContainerConfiguration info)
 		throws URISyntaxException, UnsupportedEncodingException
 	{
 		HttpPost request =
