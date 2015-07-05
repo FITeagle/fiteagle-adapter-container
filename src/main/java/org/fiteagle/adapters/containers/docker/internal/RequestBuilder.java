@@ -3,6 +3,7 @@ package org.fiteagle.adapters.containers.docker.internal;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
@@ -107,5 +108,19 @@ public class RequestBuilder {
 		request.setEntity(info.toEntity());
 
 		return request;
+	}
+
+	/**
+	 * Delete a container.
+	 */
+	public HttpDelete deleteContainer(String containerID, boolean deleteVolume, boolean force)
+		throws URISyntaxException
+	{
+		return
+			new HttpDelete(prepareBuilder()
+			               .setPath("/containers/" + containerID)
+			               .setParameter("v", deleteVolume ? "1" : "0")
+			               .setParameter("force", force ? "1" : "0")
+			               .build());
 	}
 }

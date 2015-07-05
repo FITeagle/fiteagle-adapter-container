@@ -21,5 +21,8 @@ public class Playground {
 		for (ContainerInfo ci: client.listContainers(true)) {
 			System.out.println("Found container: '" + ci.id + "' (" + ci.image + ")");
 		}
+		
+		// Delete created container
+		client.deleteContainer(containerID, true, true);
 	}
 }

@@ -14,7 +14,6 @@ public class DockerClient {
 		httpClient = HttpClients.createDefault();
 	}
 
-
 	public String createContainer(CreateContainerInfo cci)
 		throws DockerException
 	{
@@ -33,6 +32,18 @@ public class DockerClient {
 		try {
 			return ResponseParser.listContainers(
 				httpClient.execute(requestBuilder.listContainers(all))
+			);
+		} catch (Exception e) {
+			throw new DockerException(e);
+		}
+	}
+
+	public boolean deleteContainer(String containerID, boolean deleteVolume, boolean force)
+		throws DockerException
+	{
+		try {
+			return ResponseParser.deleteContainer(
+				httpClient.execute(requestBuilder.deleteContainer(containerID, deleteVolume, force))
 			);
 		} catch (Exception e) {
 			throw new DockerException(e);

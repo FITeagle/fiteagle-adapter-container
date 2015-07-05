@@ -35,10 +35,13 @@ public abstract class ResponseParser {
 	}
 
 	/**
+	 * Parse response to a list-container request.
+	 * @return List of containers
 	 */
 	public static LinkedList<ContainerInfo> listContainers(HttpResponse response)
 		throws DockerException
 	{
+		// TODO: More concrete information about failure (different message for each status code)
 		if (response.getStatusLine().getStatusCode() != 200)
 			throw new DockerException("Failed to list containers");
 
@@ -74,6 +77,7 @@ public abstract class ResponseParser {
 	public static String createContainer(HttpResponse response)
 		throws DockerException
 	{
+		// TODO: More concrete information about failure (different message for each status code)
 		if (response.getStatusLine().getStatusCode() != 201)
 			throw new DockerException("Failed to create container");
 
@@ -101,5 +105,30 @@ public abstract class ResponseParser {
 		}
 
 		return extractContainerID(jsonObject.get("Id"));
+	}
+
+	/**
+	 * Parse response to a delete-container request.
+	 * @return false if container did not exist, otherwise true
+	 */
+	public static boolean deleteContainer(HttpResponse response)
+		throws DockerException
+	{
+		switch (response.getStatusLine().getStatusCode()) {
+			case 204:
+				return true;
+
+			case 404:
+				return false;
+
+			case 400:
+				throw new DockerException("Bad parameter to delete-container request");
+
+			case 500:
+				throw new DockerException("Server error");
+
+			default:
+				throw new DockerException("Unknown status code");
+		}
 	}
 }
