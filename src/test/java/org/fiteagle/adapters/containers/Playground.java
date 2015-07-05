@@ -1,7 +1,7 @@
 package org.fiteagle.adapters.containers;
 
 import org.fiteagle.adapters.containers.docker.internal.ContainerInfo;
-import org.fiteagle.adapters.containers.docker.internal.CreateContainerInfo;
+import org.fiteagle.adapters.containers.docker.internal.ContainerConfiguration;
 import org.fiteagle.adapters.containers.docker.internal.DockerClient;
 import org.fiteagle.adapters.containers.docker.internal.DockerException;
 
@@ -13,7 +13,7 @@ public class Playground {
 
 		// Create container
 		String containerID =
-			client.createContainer(new CreateContainerInfo("my_container", "ubuntu"));
+			client.createContainer(new ContainerConfiguration("my_container", "ubuntu"));
 
 		System.out.println("Created '" + containerID + "'");
 
