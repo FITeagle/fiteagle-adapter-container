@@ -41,9 +41,20 @@ public abstract class ResponseParser {
 	public static LinkedList<ContainerInfo> listContainers(HttpResponse response)
 		throws DockerException
 	{
-		// TODO: More concrete information about failure (different message for each status code)
-		if (response.getStatusLine().getStatusCode() != 200)
-			throw new DockerException("Failed to list containers");
+		int statusCode = response.getStatusLine().getStatusCode();
+		if (statusCode != 200) {
+			switch (statusCode) {
+				case 400:
+					throw new DockerException("Bad parameter");
+
+				case 500:
+					throw new DockerException("Server error");
+
+				default:
+					throw new DockerException("Unknown status code");
+			}
+		}
+
 
 		JsonElement jsonResult = null;
 
@@ -71,15 +82,29 @@ public abstract class ResponseParser {
 	}
 
 	/**
-	 * Parse the response to a create-container request.
+	 * Parse response to a create-container request.
 	 * @return Container ID
 	 */
 	public static String createContainer(HttpResponse response)
 		throws DockerException
 	{
-		// TODO: More concrete information about failure (different message for each status code)
-		if (response.getStatusLine().getStatusCode() != 201)
-			throw new DockerException("Failed to create container");
+		int statusCode = response.getStatusLine().getStatusCode();
+		if (statusCode != 201) {
+			switch (statusCode) {
+				case 404:
+					// This status code makes no sense, but the API specification lists it.
+					throw new DockerException("No such container");
+
+				case 406:
+					throw new DockerException("Impossible to attach");
+
+				case 500:
+					throw new DockerException("Server error");
+
+				default:
+					throw new DockerException("Unknown status code");
+			}
+		}
 
 		JsonElement jsonResult = null;
 
