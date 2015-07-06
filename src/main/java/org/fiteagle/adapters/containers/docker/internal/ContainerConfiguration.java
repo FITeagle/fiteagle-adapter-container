@@ -49,7 +49,7 @@ public class ContainerConfiguration {
 	/**
 	 * Execution environment variables
 	 */
-	private JsonObject environment;
+	private JsonArray environment;
 
 	/**
 	 * Command to be executed inside the container
@@ -65,7 +65,7 @@ public class ContainerConfiguration {
 		host = domain = containerName;
 		image = containerImage;
 
-		environment = new JsonObject();
+		environment = new JsonArray();
 		command = new JsonArray();
 		labels = new JsonObject();
 	}
@@ -74,36 +74,14 @@ public class ContainerConfiguration {
 	 * Set an environment variable.
 	 */
 	public void putEnvironment(String name, String value) {
-		environment.addProperty(name, value);
-	}
-
-	/**
-	 * Remove an environment variable.
-	 */
-	public void removeEnvironment(String name) {
-		environment.remove(name);
-	}
-
-	/**
-	 * Fetch all environment variables.
-	 */
-	public TreeMap<String, String> getEnvironment() {
-		TreeMap<String, String> map = new TreeMap<String, String>();
-
-		// This seems cumbersome, there should be another way of copying
-		// the key-value associations.
-		for (Entry<String, JsonElement> pair: environment.entrySet()) {
-			map.put(pair.getKey(), pair.getValue().getAsString());
-		}
-
-		return map;
+		environment.add(new JsonPrimitive(name + "=" + value));
 	}
 
 	/**
 	 * Remove all environment variables.
 	 */
 	public void clearEnvironment() {
-		environment = new JsonObject();
+		environment = new JsonArray();
 	}
 
 	/**
