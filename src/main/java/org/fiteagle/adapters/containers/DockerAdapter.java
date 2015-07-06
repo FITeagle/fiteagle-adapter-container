@@ -18,8 +18,6 @@ public class DockerAdapter extends AbstractAdapter {
 			throws ProcessingException, InvalidRequestException {
 		// TODO Auto-generated method stub
 		
-		
-		
 		return null;
 	}
 
