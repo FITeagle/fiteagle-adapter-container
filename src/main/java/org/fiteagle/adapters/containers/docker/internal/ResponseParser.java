@@ -38,7 +38,7 @@ public abstract class ResponseParser {
 	 * Parse response to a list-container request.
 	 * @return List of containers
 	 */
-	public static LinkedList<ContainerInfo> listContainers(HttpResponse response)
+	public static LinkedList<ContainerHandle> listContainers(HttpResponse response)
 		throws DockerException
 	{
 		int statusCode = response.getStatusLine().getStatusCode();
@@ -72,7 +72,7 @@ public abstract class ResponseParser {
 			throw new DockerException("Unexpected result schema");
 		}
 
-		LinkedList<ContainerInfo> containers = new LinkedList<ContainerInfo>();
+		LinkedList<ContainerHandle> containers = new LinkedList<ContainerHandle>();
 
 		for (JsonElement containerValue: jsonResult.getAsJsonArray()) {
 			containers.add(ContainerInfo.fromJson(containerValue));
