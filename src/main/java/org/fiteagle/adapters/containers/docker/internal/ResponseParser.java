@@ -93,8 +93,7 @@ public abstract class ResponseParser {
 		if (statusCode != 201) {
 			switch (statusCode) {
 				case 404:
-					// This status code makes no sense, but the API specification lists it.
-					throw new DockerException("No such container");
+					throw new DockerException("No such image");
 
 				case 406:
 					throw new DockerException("Impossible to attach");
