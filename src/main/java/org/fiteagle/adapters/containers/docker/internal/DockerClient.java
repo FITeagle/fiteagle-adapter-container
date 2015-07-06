@@ -82,4 +82,37 @@ public class DockerClient {
 			throw new DockerException(e);
 		}
 	}
+
+	/**
+	 * Start a container.
+	 * @param containerID Container identifier
+	 */
+	public boolean startContainer(String containerID)
+		throws DockerException
+	{
+		try {
+			return ResponseParser.startContainer(
+				httpClient.execute(requestBuilder.startContainer(containerID))
+			);
+		} catch (Exception e) {
+			throw new DockerException(e);
+		}
+	}
+
+	/**
+	 * Stop a container.
+	 * @param containerID Container identifier
+	 * @param timeout Seconds to wait before killing the container
+	 */
+	public boolean stopContainer(String containerID, int timeout)
+		throws DockerException
+	{
+		try {
+			return ResponseParser.stopContainer(
+				httpClient.execute(requestBuilder.stopContainer(containerID, timeout))
+			);
+		} catch (Exception e) {
+			throw new DockerException(e);
+		}
+	}
 }

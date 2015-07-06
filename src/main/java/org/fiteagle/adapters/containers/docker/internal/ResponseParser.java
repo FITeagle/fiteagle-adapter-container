@@ -194,4 +194,56 @@ public abstract class ResponseParser {
 
 		return ContainerInspection.fromJSON(jsonResult);
 	}
+
+	/**
+	 * Parse response to a start-container request.
+	 * @return true if the container has been started, false if it was already started
+	 */
+	public static boolean startContainer(HttpResponse response)
+		throws DockerException
+	{
+		int statusCode = response.getStatusLine().getStatusCode();
+		switch (statusCode) {
+			case 204:
+				return true;
+
+			case 304:
+				return false;
+
+			case 404:
+				throw new DockerException("Container not found");
+
+			case 500:
+				throw new DockerException("Server error");
+
+			default:
+				throw new DockerException("Unknown status code");
+		}
+	}
+
+	/**
+	 * Parse response to a stop-container request.
+	 * @return true if the container has been stop, false if it was not active in the first place
+	 */
+	public static boolean stopContainer(HttpResponse response)
+		throws DockerException
+	{
+		int statusCode = response.getStatusLine().getStatusCode();
+		switch (statusCode) {
+			case 204:
+				return true;
+
+			case 304:
+				return false;
+
+			case 404:
+				throw new DockerException("Container not found");
+
+			case 500:
+				throw new DockerException("Server error");
+
+			default:
+				throw new DockerException("Unknown status code");
+		}
+	}
 }

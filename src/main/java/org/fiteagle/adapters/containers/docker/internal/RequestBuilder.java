@@ -7,6 +7,7 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.StringEntity;
 
 /**
  * Use this to build HTTP request objects which can be sent to an API endpoint.
@@ -103,8 +104,6 @@ public class RequestBuilder {
 			             .build());
 
 		request.addHeader("Content-Type", "application/json");
-
-		// Attach payload
 		request.setEntity(info.toEntity());
 
 		return request;
@@ -134,5 +133,36 @@ public class RequestBuilder {
 			new HttpGet(prepareBuilder()
 			            .setPath("/containers/" + containerID + "/json")
 			            .build());
+	}
+
+	/**
+	 * Start a container.
+	 */
+	public HttpPost startContainer(String containerID)
+		throws URISyntaxException, UnsupportedEncodingException
+	{
+		HttpPost request =
+			new HttpPost(prepareBuilder()
+			             .setPath("/containers/" + containerID + "/start")
+			             .build());
+
+		request.addHeader("Content-Type", "application/json");
+
+		// TODO: Add start configuration
+		request.setEntity(new StringEntity("{}"));
+
+		return request;
+	}
+
+	/**
+	 * Start a container.
+	 */
+	public HttpPost stopContainer(String containerID, int timeout)
+		throws URISyntaxException
+	{
+		return
+			new HttpPost(prepareBuilder()
+			             .setPath("/containers/" + containerID + "/stop")
+			             .build());
 	}
 }
