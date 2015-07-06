@@ -167,6 +167,31 @@ public class RequestBuilder {
 	}
 
 	/**
+	 * Kill a container.
+	 */
+	public HttpPost killContainer(String containerID, String signal)
+		throws URISyntaxException
+	{
+		return
+			new HttpPost(prepareBuilder()
+			             .setPath("/containers/" + containerID + "/kill")
+			             .setParameter("signal", signal)
+			             .build());
+	}
+
+	/**
+	 * Restart a container.
+	 */
+	public HttpPost restartContainer(String containerID, int timeout)
+		throws URISyntaxException
+	{
+		return
+			new HttpPost(prepareBuilder()
+			             .setPath("/containers/" + containerID + "/restart")
+			             .build());
+	}
+
+	/**
 	 * Wait for a container to exit.
 	 */
 	public HttpPost waitContainer(String containerID)

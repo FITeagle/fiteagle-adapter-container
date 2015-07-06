@@ -200,8 +200,7 @@ public abstract class ResponseParser {
 	public static boolean startContainer(HttpResponse response)
 		throws DockerException
 	{
-		int statusCode = response.getStatusLine().getStatusCode();
-		switch (statusCode) {
+		switch (response.getStatusLine().getStatusCode()) {
 			case 204:
 				return true;
 
@@ -226,13 +225,54 @@ public abstract class ResponseParser {
 	public static boolean stopContainer(HttpResponse response)
 		throws DockerException
 	{
-		int statusCode = response.getStatusLine().getStatusCode();
-		switch (statusCode) {
+		switch (response.getStatusLine().getStatusCode()) {
 			case 204:
 				return true;
 
 			case 304:
 				return false;
+
+			case 404:
+				throw new DockerException("Container not found");
+
+			case 500:
+				throw new DockerException("Server error");
+
+			default:
+				throw new DockerException("Unknown status code");
+		}
+	}
+
+	/**
+	 * Parse response to a kill-container request.
+	 */
+	public static void killContainer(HttpResponse response)
+		throws DockerException
+	{
+		switch (response.getStatusLine().getStatusCode()) {
+			case 204:
+				return;
+
+			case 404:
+				throw new DockerException("Container not found");
+
+			case 500:
+				throw new DockerException("Server error");
+
+			default:
+				throw new DockerException("Unknown status code");
+		}
+	}
+
+	/**
+	 * Parse response to a restart-container request.
+	 */
+	public static void restartContainer(HttpResponse response)
+		throws DockerException
+	{
+		switch (response.getStatusLine().getStatusCode()) {
+			case 204:
+				return;
 
 			case 404:
 				throw new DockerException("Container not found");
