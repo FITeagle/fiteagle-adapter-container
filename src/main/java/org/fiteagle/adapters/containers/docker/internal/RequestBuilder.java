@@ -165,4 +165,16 @@ public class RequestBuilder {
 			             .setPath("/containers/" + containerID + "/stop")
 			             .build());
 	}
+
+	/**
+	 * Wait for a container to exit.
+	 */
+	public HttpPost waitContainer(String containerID)
+		throws URISyntaxException
+	{
+		return
+			new HttpPost(prepareBuilder()
+			             .setPath("/containers/" + containerID + "/wait")
+			             .build());
+	}
 }

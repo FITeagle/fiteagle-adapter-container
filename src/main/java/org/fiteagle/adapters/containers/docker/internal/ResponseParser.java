@@ -8,6 +8,7 @@ import org.apache.http.HttpResponse;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 
 /**
  * Parse HTTP responses according to the expected result type.
@@ -189,9 +190,6 @@ public abstract class ResponseParser {
 			throw new DockerException(e);
 		}
 
-		if (jsonResult == null)
-			throw new DockerException("Unexpected result type");
-
 		return ContainerInspection.fromJSON(jsonResult);
 	}
 
@@ -245,5 +243,55 @@ public abstract class ResponseParser {
 			default:
 				throw new DockerException("Unknown status code");
 		}
+	}
+
+	/**
+	 * Parse response to a wait-container request.
+	 * @return Status code upon exit
+	 */
+	public static int waitContainer(HttpResponse response)
+		throws DockerException
+	{
+		int statusCode = response.getStatusLine().getStatusCode();
+		if (statusCode != 200) {
+			switch (statusCode) {
+				case 404:
+					throw new DockerException("Container not found");
+
+				case 500:
+					throw new DockerException("Server error");
+
+				default:
+					throw new DockerException("Unknown status code");
+			}
+		}
+
+		JsonElement jsonResult = null;
+
+		// Obtain resulting JSON object
+		try {
+			jsonResult = new JsonParser().parse(
+				new InputStreamReader(response.getEntity().getContent())
+			);
+		} catch (Exception e) {
+			throw new DockerException(e);
+		}
+
+		if (jsonResult == null || !jsonResult.isJsonObject())
+			throw new DockerException("Unexpected result type");
+
+		JsonObject object = jsonResult.getAsJsonObject();
+
+		if (!object.has("StatusCode"))
+			throw new DockerException("Unexpected result schema");
+
+		JsonElement statusElem = object.get("StatusCode");
+
+		if (!statusElem.isJsonPrimitive())
+			throw new DockerException("Expected status code to be a JSON primitive");
+
+		JsonPrimitive statusPrim = statusElem.getAsJsonPrimitive();
+
+		return statusPrim.getAsInt();
 	}
 }
