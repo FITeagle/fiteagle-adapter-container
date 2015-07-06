@@ -119,6 +119,40 @@ public class DockerClient {
 	}
 
 	/**
+	 * Kill a container.
+	 * @param containerID Container identifier
+	 * @param signal Specify a signal name to kill the container process with
+	 */
+	public void killContainer(String containerID, String signal)
+		throws DockerException
+	{
+		try {
+			ResponseParser.killContainer(
+				httpClient.execute(requestBuilder.killContainer(containerID, signal))
+			);
+		} catch (Exception e) {
+			throw new DockerException(e);
+		}
+	}
+
+	/**
+	 * Restart a container.
+	 * @param containerID Container identifier
+	 * @param timeout Seconds to wait before killing the container
+	 */
+	public void restartContainer(String containerID, int timeout)
+		throws DockerException
+	{
+		try {
+			ResponseParser.restartContainer(
+				httpClient.execute(requestBuilder.restartContainer(containerID, timeout))
+			);
+		} catch (Exception e) {
+			throw new DockerException(e);
+		}
+	}
+
+	/**
 	 * Wait for a container to exit.
 	 * @param containerID Container identifier
 	 * @return Status code upon exit
