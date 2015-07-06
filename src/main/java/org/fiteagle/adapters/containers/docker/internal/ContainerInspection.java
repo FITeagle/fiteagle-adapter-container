@@ -3,6 +3,8 @@ package org.fiteagle.adapters.containers.docker.internal;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+// TODO: Extend information captured by ContainerInspection
+
 public class ContainerInspection {
 	/**
 	 * Container configuration
