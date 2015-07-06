@@ -75,7 +75,7 @@ public abstract class ResponseParser {
 		LinkedList<ContainerHandle> containers = new LinkedList<ContainerHandle>();
 
 		for (JsonElement containerValue: jsonResult.getAsJsonArray()) {
-			containers.add(ContainerInfo.fromJson(containerValue));
+			containers.add(ContainerHandle.fromJSON(containerValue));
 		}
 
 		return containers;
