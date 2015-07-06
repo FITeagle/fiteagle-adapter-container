@@ -13,9 +13,9 @@ public class Playground {
 
 		// Create container
 		ContainerConfiguration config = new ContainerConfiguration("my_container", "ubuntu");
-		config.setCommandEasily("/bin/echo", "$MESSAGE");
+		config.setCommandEasily("/usr/bin/env");
 		config.putLabel("is_echo", "true");
-		config.putEnvironment("MESSAGE", "Hello World");
+		config.putEnvironment("MESSAGE", "HelloWorld");
 
 		System.out.println(config.toJsonObject().toString());
 
@@ -25,6 +25,9 @@ public class Playground {
 		// Inspect container
 		ContainerInspection info = client.inspectContainer(containerID);
 		System.out.println(info.config.toJsonObject().toString());
+
+		// Start container
+		client.startContainer(containerID);
 
 		// Delete created container
 		client.deleteContainer(containerID, true, true);
