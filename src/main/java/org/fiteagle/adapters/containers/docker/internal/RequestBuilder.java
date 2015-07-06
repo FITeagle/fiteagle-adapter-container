@@ -123,4 +123,16 @@ public class RequestBuilder {
 			               .setParameter("force", force ? "1" : "0")
 			               .build());
 	}
+
+	/**
+	 * Inspect a container.
+	 */
+	public HttpGet inspectContainer(String containerID)
+		throws URISyntaxException
+	{
+		return
+			new HttpGet(prepareBuilder()
+			            .setPath("/containers/" + containerID + "/json")
+			            .build());
+	}
 }

@@ -66,4 +66,20 @@ public class DockerClient {
 			throw new DockerException(e);
 		}
 	}
+
+	/**
+	 * Inspect a container.
+	 * @param containerID Container identifier
+	 */
+	public ContainerInspection inspectContainer(String containerID)
+		throws DockerException
+	{
+		try {
+			return ResponseParser.inspectContainer(
+				httpClient.execute(requestBuilder.inspectContainer(containerID))
+			);
+		} catch (Exception e) {
+			throw new DockerException(e);
+		}
+	}
 }
