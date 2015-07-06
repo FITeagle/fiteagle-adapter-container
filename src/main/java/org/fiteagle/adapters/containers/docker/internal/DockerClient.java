@@ -20,12 +20,12 @@ public class DockerClient {
 	/**
 	 * Create a new container using the given information.
 	 */
-	public String createContainer(ContainerConfiguration cci)
+	public String create(ContainerConfiguration cci)
 		throws DockerException
 	{
 		try {
-			return ResponseParser.createContainer(
-				httpClient.execute(requestBuilder.createContainer(cci))
+			return ResponseParser.create(
+				httpClient.execute(requestBuilder.create(cci))
 			);
 		} catch (Exception e) {
 			throw new DockerException(e);
@@ -36,12 +36,12 @@ public class DockerClient {
 	 * List containers.
 	 * @param all Specify whether to list all containers or not
 	 */
-	public LinkedList<ContainerHandle> listContainers(boolean all)
+	public LinkedList<ContainerHandle> list(boolean all)
 		throws DockerException
 	{
 		try {
-			return ResponseParser.listContainers(
-				httpClient.execute(requestBuilder.listContainers(all))
+			return ResponseParser.list(
+				httpClient.execute(requestBuilder.list(all))
 			);
 		} catch (Exception e) {
 			throw new DockerException(e);
@@ -55,12 +55,12 @@ public class DockerClient {
 	 * @param force Kill the container before removing it
 	 * @return Whether the container has been deleted or not
 	 */
-	public boolean deleteContainer(String containerID, boolean deleteVolume, boolean force)
+	public boolean delete(String containerID, boolean deleteVolume, boolean force)
 		throws DockerException
 	{
 		try {
-			return ResponseParser.deleteContainer(
-				httpClient.execute(requestBuilder.deleteContainer(containerID, deleteVolume, force))
+			return ResponseParser.delete(
+				httpClient.execute(requestBuilder.delete(containerID, deleteVolume, force))
 			);
 		} catch (Exception e) {
 			throw new DockerException(e);
@@ -71,12 +71,12 @@ public class DockerClient {
 	 * Inspect a container.
 	 * @param containerID Container identifier
 	 */
-	public ContainerInspection inspectContainer(String containerID)
+	public ContainerInspection inspect(String containerID)
 		throws DockerException
 	{
 		try {
-			return ResponseParser.inspectContainer(
-				httpClient.execute(requestBuilder.inspectContainer(containerID))
+			return ResponseParser.inspect(
+				httpClient.execute(requestBuilder.inspect(containerID))
 			);
 		} catch (Exception e) {
 			throw new DockerException(e);
@@ -88,12 +88,12 @@ public class DockerClient {
 	 * @param containerID Container identifier
 	 * @return true if the container has been started, false if it was already started
 	 */
-	public boolean startContainer(String containerID)
+	public boolean start(String containerID)
 		throws DockerException
 	{
 		try {
-			return ResponseParser.startContainer(
-				httpClient.execute(requestBuilder.startContainer(containerID))
+			return ResponseParser.start(
+				httpClient.execute(requestBuilder.start(containerID))
 			);
 		} catch (Exception e) {
 			throw new DockerException(e);
@@ -106,12 +106,12 @@ public class DockerClient {
 	 * @param timeout Seconds to wait before killing the container
 	 * @return true if the container has been stop, false if it was not active in the first place
 	 */
-	public boolean stopContainer(String containerID, int timeout)
+	public boolean stop(String containerID, int timeout)
 		throws DockerException
 	{
 		try {
-			return ResponseParser.stopContainer(
-				httpClient.execute(requestBuilder.stopContainer(containerID, timeout))
+			return ResponseParser.stop(
+				httpClient.execute(requestBuilder.stop(containerID, timeout))
 			);
 		} catch (Exception e) {
 			throw new DockerException(e);
@@ -123,12 +123,12 @@ public class DockerClient {
 	 * @param containerID Container identifier
 	 * @param signal Specify a signal name to kill the container process with
 	 */
-	public void killContainer(String containerID, String signal)
+	public void kill(String containerID, String signal)
 		throws DockerException
 	{
 		try {
-			ResponseParser.killContainer(
-				httpClient.execute(requestBuilder.killContainer(containerID, signal))
+			ResponseParser.kill(
+				httpClient.execute(requestBuilder.kill(containerID, signal))
 			);
 		} catch (Exception e) {
 			throw new DockerException(e);
@@ -140,12 +140,12 @@ public class DockerClient {
 	 * @param containerID Container identifier
 	 * @param timeout Seconds to wait before killing the container
 	 */
-	public void restartContainer(String containerID, int timeout)
+	public void restart(String containerID, int timeout)
 		throws DockerException
 	{
 		try {
-			ResponseParser.restartContainer(
-				httpClient.execute(requestBuilder.restartContainer(containerID, timeout))
+			ResponseParser.restart(
+				httpClient.execute(requestBuilder.restart(containerID, timeout))
 			);
 		} catch (Exception e) {
 			throw new DockerException(e);
@@ -157,12 +157,12 @@ public class DockerClient {
 	 * @param containerID Container identifier
 	 * @return Status code upon exit
 	 */
-	public int waitContainer(String containerID)
+	public int waitFor(String containerID)
 		throws DockerException
 	{
 		try {
-			return ResponseParser.waitContainer(
-				httpClient.execute(requestBuilder.waitContainer(containerID))
+			return ResponseParser.waitFor(
+				httpClient.execute(requestBuilder.waitFor(containerID))
 			);
 		} catch (Exception e) {
 			throw new DockerException(e);

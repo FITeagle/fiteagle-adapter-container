@@ -19,21 +19,21 @@ public class Playground {
 
 		System.out.println(config.toJsonObject().toString());
 
-		String containerID = client.createContainer(config);
+		String containerID = client.create(config);
 		System.out.println("Created '" + containerID + "'");
 
 		// Inspect container
-		ContainerInspection info = client.inspectContainer(containerID);
+		ContainerInspection info = client.inspect(containerID);
 		System.out.println(info.config.toJsonObject().toString());
 
 		// Start container
-		client.startContainer(containerID);
+		client.start(containerID);
 
 		// Wait for container to exit
-		int statusCode = client.waitContainer(containerID);
+		int statusCode = client.waitFor(containerID);
 		System.out.println("Exited with status code " + statusCode);
 
 		// Delete created container
-		client.deleteContainer(containerID, true, true);
+		client.delete(containerID, true, true);
 	}
 }

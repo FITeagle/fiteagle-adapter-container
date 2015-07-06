@@ -39,7 +39,7 @@ public abstract class ResponseParser {
 	 * Parse response to a list-container request.
 	 * @return List of containers
 	 */
-	public static LinkedList<ContainerHandle> listContainers(HttpResponse response)
+	public static LinkedList<ContainerHandle> list(HttpResponse response)
 		throws DockerException
 	{
 		int statusCode = response.getStatusLine().getStatusCode();
@@ -86,7 +86,7 @@ public abstract class ResponseParser {
 	 * Parse response to a create-container request.
 	 * @return Container ID
 	 */
-	public static String createContainer(HttpResponse response)
+	public static String create(HttpResponse response)
 		throws DockerException
 	{
 		int statusCode = response.getStatusLine().getStatusCode();
@@ -136,7 +136,7 @@ public abstract class ResponseParser {
 	 * Parse response to a delete-container request.
 	 * @return false if container did not exist, otherwise true
 	 */
-	public static boolean deleteContainer(HttpResponse response)
+	public static boolean delete(HttpResponse response)
 		throws DockerException
 	{
 		switch (response.getStatusLine().getStatusCode()) {
@@ -161,7 +161,7 @@ public abstract class ResponseParser {
 	 * Parse response to a inspect-container request.
 	 * @return Container configuration
 	 */
-	public static ContainerInspection inspectContainer(HttpResponse response)
+	public static ContainerInspection inspect(HttpResponse response)
 		throws DockerException
 	{
 		int statusCode = response.getStatusLine().getStatusCode();
@@ -196,7 +196,7 @@ public abstract class ResponseParser {
 	 * Parse response to a start-container request.
 	 * @return true if the container has been started, false if it was already started
 	 */
-	public static boolean startContainer(HttpResponse response)
+	public static boolean start(HttpResponse response)
 		throws DockerException
 	{
 		switch (response.getStatusLine().getStatusCode()) {
@@ -221,7 +221,7 @@ public abstract class ResponseParser {
 	 * Parse response to a stop-container request.
 	 * @return true if the container has been stop, false if it was not active in the first place
 	 */
-	public static boolean stopContainer(HttpResponse response)
+	public static boolean stop(HttpResponse response)
 		throws DockerException
 	{
 		switch (response.getStatusLine().getStatusCode()) {
@@ -245,7 +245,7 @@ public abstract class ResponseParser {
 	/**
 	 * Parse response to a kill-container request.
 	 */
-	public static void killContainer(HttpResponse response)
+	public static void kill(HttpResponse response)
 		throws DockerException
 	{
 		switch (response.getStatusLine().getStatusCode()) {
@@ -266,7 +266,7 @@ public abstract class ResponseParser {
 	/**
 	 * Parse response to a restart-container request.
 	 */
-	public static void restartContainer(HttpResponse response)
+	public static void restart(HttpResponse response)
 		throws DockerException
 	{
 		switch (response.getStatusLine().getStatusCode()) {
@@ -288,7 +288,7 @@ public abstract class ResponseParser {
 	 * Parse response to a wait-container request.
 	 * @return Status code upon exit
 	 */
-	public static int waitContainer(HttpResponse response)
+	public static int waitFor(HttpResponse response)
 		throws DockerException
 	{
 		int statusCode = response.getStatusLine().getStatusCode();

@@ -83,7 +83,7 @@ public class RequestBuilder {
 	/**
 	 * List containers.
 	 */
-	public HttpGet listContainers(boolean all) throws URISyntaxException {
+	public HttpGet list(boolean all) throws URISyntaxException {
 		return
 			new HttpGet(prepareBuilder()
 			            .setPath("/containers/json")
@@ -95,7 +95,7 @@ public class RequestBuilder {
 	/**
 	 * Create a container.
 	 */
-	public HttpPost createContainer(ContainerConfiguration info)
+	public HttpPost create(ContainerConfiguration info)
 		throws URISyntaxException, UnsupportedEncodingException
 	{
 		HttpPost request =
@@ -112,7 +112,7 @@ public class RequestBuilder {
 	/**
 	 * Delete a container.
 	 */
-	public HttpDelete deleteContainer(String containerID, boolean deleteVolume, boolean force)
+	public HttpDelete delete(String containerID, boolean deleteVolume, boolean force)
 		throws URISyntaxException
 	{
 		return
@@ -126,7 +126,7 @@ public class RequestBuilder {
 	/**
 	 * Inspect a container.
 	 */
-	public HttpGet inspectContainer(String containerID)
+	public HttpGet inspect(String containerID)
 		throws URISyntaxException
 	{
 		return
@@ -138,7 +138,7 @@ public class RequestBuilder {
 	/**
 	 * Start a container.
 	 */
-	public HttpPost startContainer(String containerID)
+	public HttpPost start(String containerID)
 		throws URISyntaxException, UnsupportedEncodingException
 	{
 		HttpPost request =
@@ -157,7 +157,7 @@ public class RequestBuilder {
 	/**
 	 * Start a container.
 	 */
-	public HttpPost stopContainer(String containerID, int timeout)
+	public HttpPost stop(String containerID, int timeout)
 		throws URISyntaxException
 	{
 		return
@@ -169,7 +169,7 @@ public class RequestBuilder {
 	/**
 	 * Kill a container.
 	 */
-	public HttpPost killContainer(String containerID, String signal)
+	public HttpPost kill(String containerID, String signal)
 		throws URISyntaxException
 	{
 		return
@@ -182,7 +182,7 @@ public class RequestBuilder {
 	/**
 	 * Restart a container.
 	 */
-	public HttpPost restartContainer(String containerID, int timeout)
+	public HttpPost restart(String containerID, int timeout)
 		throws URISyntaxException
 	{
 		return
@@ -194,7 +194,7 @@ public class RequestBuilder {
 	/**
 	 * Wait for a container to exit.
 	 */
-	public HttpPost waitContainer(String containerID)
+	public HttpPost waitFor(String containerID)
 		throws URISyntaxException
 	{
 		return
