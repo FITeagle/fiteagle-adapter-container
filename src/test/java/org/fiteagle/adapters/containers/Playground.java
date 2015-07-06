@@ -1,6 +1,6 @@
 package org.fiteagle.adapters.containers;
 
-import org.fiteagle.adapters.containers.docker.internal.ContainerInfo;
+import org.fiteagle.adapters.containers.docker.internal.ContainerHandle;
 import org.fiteagle.adapters.containers.docker.internal.ContainerConfiguration;
 import org.fiteagle.adapters.containers.docker.internal.DockerClient;
 import org.fiteagle.adapters.containers.docker.internal.DockerException;
@@ -18,7 +18,7 @@ public class Playground {
 		System.out.println("Created '" + containerID + "'");
 
 		// List containers
-		for (ContainerInfo ci: client.listContainers(true)) {
+		for (ContainerHandle ci: client.listContainers(true)) {
 			System.out.println("Found container: '" + ci.id + "' (" + ci.image + ")");
 		}
 		

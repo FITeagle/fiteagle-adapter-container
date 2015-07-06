@@ -36,7 +36,7 @@ public class DockerClient {
 	 * List containers.
 	 * @param all Specify whether to list all containers or not
 	 */
-	public LinkedList<ContainerInfo> listContainers(boolean all)
+	public LinkedList<ContainerHandle> listContainers(boolean all)
 		throws DockerException
 	{
 		try {

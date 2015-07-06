@@ -3,7 +3,7 @@ package org.fiteagle.adapters.containers.docker.internal;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public class ContainerInfo {
+public class ContainerHandle {
 	/**
 	 * Container ID
 	 */
@@ -14,7 +14,7 @@ public class ContainerInfo {
 	 */
 	public final String image;
 
-	private ContainerInfo(String containerID, String containerImage) {
+	private ContainerHandle(String containerID, String containerImage) {
 		id = containerID;
 		image = containerImage;
 	}
@@ -22,7 +22,7 @@ public class ContainerInfo {
 	/**
 	 * Construct a container info using a JSON object.
 	 */
-	public static ContainerInfo fromJson(JsonElement value)
+	public static ContainerHandle fromJSON(JsonElement value)
 		throws DockerException
 	{
 		// Check type
@@ -40,7 +40,7 @@ public class ContainerInfo {
 		if (!jsonImage.isJsonPrimitive())
 			throw new DockerException("Container info field 'Image' must be a String");
 
-		return new ContainerInfo(
+		return new ContainerHandle(
 			ResponseParser.extractContainerID(containerInfo.get("Id")),
 			jsonImage.getAsString()
 		);
