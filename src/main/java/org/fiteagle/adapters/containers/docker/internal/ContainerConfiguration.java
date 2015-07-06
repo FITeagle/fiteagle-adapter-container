@@ -37,14 +37,19 @@ public class ContainerConfiguration {
 	public String image;
 
 	/**
-	 * Execution environment variables
-	 */
-	private JsonObject environment;
-
-	/**
 	 * Working directory for the commands to be executed in
 	 */
 	public String workingDirectory = null;
+
+	/**
+	 * Allocate a pseudo-terminal for the container
+	 */
+	boolean tty = false;
+
+	/**
+	 * Execution environment variables
+	 */
+	private JsonObject environment;
 
 	/**
 	 * Command to be executed inside the container
@@ -159,19 +164,24 @@ public class ContainerConfiguration {
 	public JsonObject toJsonObject() {
 		JsonObject resultObject = new JsonObject();
 
-		resultObject.addProperty("Hostname", host);
-		resultObject.addProperty("Domainname", domain);
+		if (host != null)
+			resultObject.addProperty("Hostname", host);
+
+		if (domain != null)
+			resultObject.addProperty("Domainname", domain);
 
 		if (user != null)
 			resultObject.addProperty("User", user);
 
-		resultObject.add("Env", environment);
-		resultObject.add("Cmd", command);
-
-		resultObject.addProperty("Image", image);
+		if (user != null)
+			resultObject.addProperty("Image", image);
 
 		if (workingDirectory != null)
 			resultObject.addProperty("WorkingDir", workingDirectory);
+
+		resultObject.addProperty("Tty", tty);
+		resultObject.add("Env", environment);
+		resultObject.add("Cmd", command);
 
 		return resultObject;
 	}
