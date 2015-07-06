@@ -5,11 +5,21 @@ import org.fiteagle.abstractAdapter.AbstractAdapter;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 
+
+
+
 public class DockerAdapter extends AbstractAdapter {
+	
+	
+	Resource adapter;
+	
 	@Override
-	public Model createInstance(String arg0, Model arg1)
+	public Model createInstance(String instanceURI, Model instanceModel)
 			throws ProcessingException, InvalidRequestException {
 		// TODO Auto-generated method stub
+		
+		
+		
 		return null;
 	}
 

@@ -2,4 +2,12 @@
 @prefix owl:   <http://www.w3.org/2002/07/owl#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix omn:   <http://open-multinet.info/ontology/omn#> .
+@prefix docker:		<http://>.
 
+docker:images
+	rdfs:label: "DockerImages";
+	rdfs:comment "Available Images";
+	
+docker:image
+	rdfs:label: "DockerImage"
+	rdfs:label: "specific DockerImage"
