@@ -156,4 +156,42 @@ public abstract class ResponseParser {
 				throw new DockerException("Unknown status code");
 		}
 	}
+
+	/**
+	 * Parse response to a inspect-container request.
+	 * @return Container configuration
+	 */
+	public static ContainerInspection inspectContainer(HttpResponse response)
+		throws DockerException
+	{
+		int statusCode = response.getStatusLine().getStatusCode();
+		if (statusCode != 200) {
+			switch (statusCode) {
+				case 404:
+					throw new DockerException("Container not found");
+
+				case 500:
+					throw new DockerException("Server error");
+
+				default:
+					throw new DockerException("Unknown status code");
+			}
+		}
+
+		JsonElement jsonResult = null;
+
+		// Obtain resulting JSON object
+		try {
+			jsonResult = new JsonParser().parse(
+				new InputStreamReader(response.getEntity().getContent())
+			);
+		} catch (Exception e) {
+			throw new DockerException(e);
+		}
+
+		if (jsonResult == null)
+			throw new DockerException("Unexpected result type");
+
+		return ContainerInspection.fromJSON(jsonResult);
+	}
 }
