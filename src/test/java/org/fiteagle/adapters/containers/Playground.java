@@ -29,6 +29,10 @@ public class Playground {
 		// Start container
 		client.startContainer(containerID);
 
+		// Wait for container to exit
+		int statusCode = client.waitContainer(containerID);
+		System.out.println("Exited with status code " + statusCode);
+
 		// Delete created container
 		client.deleteContainer(containerID, true, true);
 	}

@@ -86,6 +86,7 @@ public class DockerClient {
 	/**
 	 * Start a container.
 	 * @param containerID Container identifier
+	 * @return true if the container has been started, false if it was already started
 	 */
 	public boolean startContainer(String containerID)
 		throws DockerException
@@ -103,6 +104,7 @@ public class DockerClient {
 	 * Stop a container.
 	 * @param containerID Container identifier
 	 * @param timeout Seconds to wait before killing the container
+	 * @return true if the container has been stop, false if it was not active in the first place
 	 */
 	public boolean stopContainer(String containerID, int timeout)
 		throws DockerException
@@ -110,6 +112,23 @@ public class DockerClient {
 		try {
 			return ResponseParser.stopContainer(
 				httpClient.execute(requestBuilder.stopContainer(containerID, timeout))
+			);
+		} catch (Exception e) {
+			throw new DockerException(e);
+		}
+	}
+
+	/**
+	 * Wait for a container to exit.
+	 * @param containerID Container identifier
+	 * @return Status code upon exit
+	 */
+	public int waitContainer(String containerID)
+		throws DockerException
+	{
+		try {
+			return ResponseParser.waitContainer(
+				httpClient.execute(requestBuilder.waitContainer(containerID))
 			);
 		} catch (Exception e) {
 			throw new DockerException(e);
