@@ -2,12 +2,63 @@
 @prefix owl:   <http://www.w3.org/2002/07/owl#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix omn:   <http://open-multinet.info/ontology/omn#> .
-@prefix docker:		<http://>.
+@prefix omn-lifecycle: <http://open-multinet.info/ontology/omn-lifecycle#> .
+@prefix docker:		<http://> .
+@prefix dockerContainer <http://> 
 
-docker:images
-	rdfs:label: "DockerImages";
-	rdfs:comment "Available Images";
+dockerContainer:DockerContainer
+	rdfs:subClassOf    omn:Resource ;
+	rdfs:label	"A Docker Container"@en ;
+	omn-lifecycle:implementedBy  docker:Docker .
 	
-docker:image
-	rdfs:label: "DockerImage"
-	rdfs:label: "specific DockerImage"
+	
+dockerContainer:image
+	rdfs:label                   "image"@en ;
+dockerContainer:imageID
+	a							owl:ObjectProperty;
+	rdfs:label					"Docker imageID"@en ;
+	
+dockerContainer:id
+	rdfs:label                   "ID"@en ;
+
+dockerContainer:username
+	rdfs:label                   "username"@en ;
+dockerContainer:port
+	rdfs:label                   "port"@en ;
+
+	
+
+dockerContainer:hostname
+	rdfs:label                   "hostname"@en ;
+dockerContainer:command
+	rdfs:label                   "Command"@en ;
+dockerContainer:envVar
+	rdfs:label                   "Environment Variables"@en ;
+dockerContainer:labels
+	rdfs:label                   "DockerLabels"@en ;
+	
+	
+---------------------------------------------
+@base <http:docker>
+
+
+
+Container:id
+
+Container:resourceLimit
+
+Container:Configuration
+	
+Adapter:port
+
+Adapter:hostname
+
+Image:Author
+
+Image:Name
+
+Image:BaseImage
+
+Image:Description
+
+description:Description
