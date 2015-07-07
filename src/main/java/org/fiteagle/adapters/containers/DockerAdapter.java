@@ -33,12 +33,13 @@ public class DockerAdapter extends AbstractAdapter {
 		
 		Statement portStatement = requestedCont.getProperty(Omn_service.port);
 		
+		Statement image = requestedCont.getProperty(omn_service.)
 		
 		DockerClient client = new DockerClient("", 0); 
 		
 
 
-		ContainerConfiguration contConf = new ContainerConfiguration(instanceURI, "");
+		ContainerConfiguration contConf = new ContainerConfiguration(instanceURI, );
 		contConf.user = userName;
 		
 		//client.createContainer(contConf);
