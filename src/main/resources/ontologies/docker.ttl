@@ -3,62 +3,59 @@
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix omn:   <http://open-multinet.info/ontology/omn#> .
 @prefix omn-lifecycle: <http://open-multinet.info/ontology/omn-lifecycle#> .
-@prefix docker:		<http://> .
-@prefix dockerContainer <http://> 
+@prefix docker: <http://docker.non.existing>
 
-dockerContainer:DockerContainer
-	rdfs:subClassOf    omn:Resource ;
-	rdfs:label	"A Docker Container"@en ;
+docker:Container
+	a		owl:class;
+	rdfs:label			"The DockerContainer"@en;
+
+container:Container
+	a		owl:class;
+	rdfs:subClassOf		omn:Resource ;
+	rdfs:label			"The Container Instance"@en;
 	omn-lifecycle:implementedBy  docker:Docker .
-	
-	
-dockerContainer:image
-	rdfs:label                   "image"@en ;
-dockerContainer:imageID
-	a							owl:ObjectProperty;
-	rdfs:label					"Docker imageID"@en ;
-	
-dockerContainer:id
-	rdfs:label                   "ID"@en ;
 
-dockerContainer:username
-	rdfs:label                   "username"@en ;
-dockerContainer:port
-	rdfs:label                   "port"@en ;
+container:id
+	a 		owl:DatatypeProperty;
+	rdfs:label			"The id of a Container Instance"@en,
+	rdfs:range  		xsd:string .
 
+container:resourceLimit
+	a 		owl:DatatypeProperty;
+	rdfs:label			"The resource Limit"@en;
 	
 
-dockerContainer:hostname
-	rdfs:label                   "hostname"@en ;
-dockerContainer:command
-	rdfs:label                   "Command"@en ;
-dockerContainer:envVar
-	rdfs:label                   "Environment Variables"@en ;
-dockerContainer:labels
-	rdfs:label                   "DockerLabels"@en ;
+
+container:status
+	a 		owl:DatatypeProperty;
+
+container:Configuration
+	a		owl:class;
 	
+docker:ContainerAdapter
+	a		owl:class;	
 	
----------------------------------------------
-@base <http:docker>
-
-
-
-Container:id
-
-Container:resourceLimit
-
-Container:Configuration
+containerAdapter:ContrainerAdapter
+	a		owl:class
 	
-Adapter:port
+containerAdapter:port
+	a 		owl:DatatypeProperty;
 
-Adapter:hostname
+containerAdapter:hostname
+	a 		owl:DatatypeProperty;
 
-Image:Author
+docker:image
+	a		owl:class;
 
-Image:Name
+image:Author
+	a 		owl:DatatypeProperty;
 
-Image:BaseImage
+image:Name
+	a 		owl:DatatypeProperty;
+
+image:BaseImage
+	a 		owl:DatatypeProperty;
 
 Image:Description
+	a 		owl:DatatypeProperty;
 
-description:Description
