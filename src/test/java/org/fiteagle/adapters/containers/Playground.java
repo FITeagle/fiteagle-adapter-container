@@ -13,7 +13,8 @@ public class Playground {
 
 		// Create container
 		ContainerConfiguration config = new ContainerConfiguration("my_container", "ubuntu");
-		config.setCommandEasily("/usr/bin/env");
+		config.tty = true;
+		config.setCommandEasily("/bin/sleep 1");
 		config.putLabel("is_echo", "true");
 		config.putEnvironment("MESSAGE", "HelloWorld");
 
@@ -32,6 +33,8 @@ public class Playground {
 		// Wait for container to exit
 		int statusCode = client.waitFor(containerID);
 		System.out.println("Exited with status code " + statusCode);
+
+		client.stop(containerID, 2);
 
 		// Delete created container
 		client.delete(containerID, true, true);

@@ -44,7 +44,7 @@ public class ContainerConfiguration {
 	/**
 	 * Allocate a pseudo-terminal for the container
 	 */
-	boolean tty = false;
+	public boolean tty = false;
 
 	/**
 	 * Execution environment variables
