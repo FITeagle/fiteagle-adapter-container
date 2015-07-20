@@ -1,61 +1,25 @@
-@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix owl:   <http://www.w3.org/2002/07/owl#> .
-@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
-@prefix omn:   <http://open-multinet.info/ontology/omn#> .
-@prefix omn-lifecycle: <http://open-multinet.info/ontology/omn-lifecycle#> .
-@prefix docker: <http://docker.non.existing>
+@prefix rdfs:          <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix owl:           <http://www.w3.org/2002/07/owl#>.
+@prefix xsd:           <http://www.w3.org/2001/XMLSchema#>.
+@prefix omn:           <http://open-multinet.info/ontology/omn#>.
+@prefix omn-lifecycle: <http://open-multinet.info/ontology/omn-lifecycle#>.
+@prefix docker:        <http://docker.com/schema/docker#>.
+
+docker:Adapter
+	a                        owl:Class;
+	rdfs:label               "Docker Adapter"@en;
+	rdfs:subClassOf          omn:Adapter;
+	omn-lifecycle:implements docker:Container.
 
 docker:Container
-	a		owl:class;
-	rdfs:label			"The DockerContainer"@en;
-
-container:Container
-	a		owl:class;
-	rdfs:subClassOf		omn:Resource ;
-	rdfs:label			"The Container Instance"@en;
-	omn-lifecycle:implementedBy  docker:Docker .
-
-container:id
-	a 		owl:DatatypeProperty;
-	rdfs:label			"The id of a Container Instance"@en,
-	rdfs:range  		xsd:string .
-
-container:resourceLimit
-	a 		owl:DatatypeProperty;
-	rdfs:label			"The resource Limit"@en;
-	
-
-
-container:status
-	a 		owl:DatatypeProperty;
-
-container:Configuration
-	a		owl:class;
-	
-docker:ContainerAdapter
-	a		owl:class;	
-	
-containerAdapter:ContrainerAdapter
-	a		owl:class
-	
-containerAdapter:port
-	a 		owl:DatatypeProperty;
-
-containerAdapter:hostname
-	a 		owl:DatatypeProperty;
+	a                           owl:Class;
+	rdfs:label                  "Docker Container"@en;
+	rdfs:subClassOf             omn:Resource;
+	omn-lifecycle:implementedBy docker:Adapter.
 
 docker:image
-	a		owl:class;
-
-image:Author
-	a 		owl:DatatypeProperty;
-
-image:Name
-	a 		owl:DatatypeProperty;
-
-image:BaseImage
-	a 		owl:DatatypeProperty;
-
-Image:Description
-	a 		owl:DatatypeProperty;
-
+	a           owl:DatatypeProperty;
+	a           owl:FunctionalProperty;
+	rdfs:domain docker:Container;
+	rdfs:label  "Image identifier"@en;
+	rdfs:range  xsd:string.
