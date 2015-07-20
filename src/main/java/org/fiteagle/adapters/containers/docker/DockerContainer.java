@@ -62,14 +62,12 @@ public class DockerContainer {
         resource.addProperty(property, Omn_lifecycle.Ready);
 
         for (Property prop: instanceProperties) {
-            switch (prop.getLocalName()) {
-	            case "image":
-	        		resource.addLiteral(prop, image);
-	        		break;
+            String localName = prop.getLocalName();
 
-	            case "command":
-	        		resource.addLiteral(prop, command);
-	        		break;
+            if (localName.equals("image")) {
+        		resource.addLiteral(prop, image);
+            } else if (localName.equals("command")) {
+        		resource.addLiteral(prop, command);
             }
         }
 
