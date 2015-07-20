@@ -5,25 +5,35 @@ import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
 import java.util.LinkedList;
 
+import org.fiteagle.adapters.containers.docker.internal.ContainerConfiguration;
 import org.fiteagle.adapters.containers.docker.internal.DockerClient;
+import org.fiteagle.adapters.containers.docker.internal.DockerException;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 public class DockerContainer {
+	private static final String COMMAND_PROPERTY = "command";
+	private static final String IMAGE_PROPERTY = "image";
+	private static final String NAME_PROPERTY = "name";
+
 	private DockerClient client;
 
 	private Resource instanceResource;
 	private String instanceIdentifier;
-	LinkedList<Property> instanceProperties;
+	private LinkedList<Property> instanceProperties;
 
-	private String image = null;
-	private String command = null;
+	private String containerID = null;
+	private String containerName = null;
+	private String containerImage = null;
+	private String containerCommand = null;
 
 	public DockerContainer(
 		String uri,
@@ -38,8 +48,56 @@ public class DockerContainer {
 		client = dockerClient;
 	}
 
-	public void update(Resource resource) {
+	public boolean update(Model resource) {
+		String wantedImage = null, wantedCommand = null, wantedName = null;
 
+		StmtIterator iter = resource.listStatements();
+		while (iter.hasNext()) {
+			Statement stmt = iter.next();
+			if (!stmt.getSubject().getURI().equals(instanceIdentifier))
+				continue;
+
+			String localName = stmt.getPredicate().getLocalName();
+
+			if (localName.equals(COMMAND_PROPERTY)) {
+				wantedCommand = stmt.getString();
+			} else if (localName.equals(IMAGE_PROPERTY)) {
+				wantedImage = stmt.getString();
+			} else if (localName.equals(NAME_PROPERTY)) {
+				wantedName = stmt.getString();
+			}
+		}
+
+		wantedName    = wantedName    == null ? containerName    : wantedName;
+		wantedImage   = wantedImage   == null ? containerImage   : wantedImage;
+		wantedCommand = wantedCommand == null ? containerCommand : wantedCommand;
+
+		// Check if we really need to recreate the container
+		boolean newContainer = containerID == null;
+		newContainer |= !containerName.equals(wantedName);
+		newContainer |= !containerImage.equals(wantedImage);
+		newContainer |= !containerCommand.equals(wantedCommand);
+
+		if (newContainer) {
+			// Assemble configuration
+			ContainerConfiguration conf = new ContainerConfiguration(wantedName, wantedImage);
+			conf.setCommandEasily(wantedCommand);
+
+			// Delete if we manage a container already
+			if (containerID != null)
+				delete();
+
+			// Try to start the new container
+			try {
+				containerID = client.create(conf);
+				return (containerID != null);
+			} catch (DockerException e) {
+				e.printStackTrace();
+				return false;
+			}
+		} else {
+			return true;
+		}
 	}
 
 	public void delete() {
@@ -61,13 +119,16 @@ public class DockerContainer {
         property.addProperty(RDF.type, OWL.FunctionalProperty);
         resource.addProperty(property, Omn_lifecycle.Ready);
 
+        // Add container properties
         for (Property prop: instanceProperties) {
             String localName = prop.getLocalName();
 
-            if (localName.equals("image")) {
-        		resource.addLiteral(prop, image);
-            } else if (localName.equals("command")) {
-        		resource.addLiteral(prop, command);
+            if (localName.equals(NAME_PROPERTY)) {
+    			resource.addLiteral(prop, containerName);
+            } else if (localName.equals(IMAGE_PROPERTY)) {
+    			resource.addLiteral(prop, containerImage);
+            } else if (localName.equals(COMMAND_PROPERTY)) {
+        		resource.addLiteral(prop, containerCommand);
             }
         }
 

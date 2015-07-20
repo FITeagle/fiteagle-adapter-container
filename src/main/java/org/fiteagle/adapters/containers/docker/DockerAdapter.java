@@ -81,7 +81,7 @@ public class DockerAdapter extends AbstractAdapter {
 		);
 		instances.put(instanceURI, container);
 
-		container.update(resourceModel.getResource(instanceURI));
+		container.update(resourceModel);
 
 		return container.serializeModel();
 	}
@@ -95,8 +95,10 @@ public class DockerAdapter extends AbstractAdapter {
 		if (container == null)
 			return ModelFactory.createDefaultModel();
 
-		container.update(resourceModel.getResource(instanceURI));
-		return container.serializeModel();
+		if (container.update(resourceModel))
+			return container.serializeModel();
+		else
+			return ModelFactory.createDefaultModel();
 	}
 
 	@Override

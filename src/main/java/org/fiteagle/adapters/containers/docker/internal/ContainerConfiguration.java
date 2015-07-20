@@ -1,6 +1,7 @@
 package org.fiteagle.adapters.containers.docker.internal;
 
 import java.io.UnsupportedEncodingException;
+import java.util.LinkedList;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
@@ -97,6 +98,22 @@ public class ContainerConfiguration {
 
 	public void setCommandEasily(String... cmd) {
 		setCommand(cmd);
+	}
+
+	/**
+	 * Retrieve set commands.
+	 */
+	public String[] getCommand() {
+		if (command == null)
+			return new String[]{};
+
+		LinkedList<String> segments = new LinkedList<String>();
+
+		for (JsonElement elem: command) {
+			segments.add(elem.getAsJsonPrimitive().getAsString());
+		}
+
+		return segments.toArray(new String[segments.size()]);
 	}
 
 	/**
