@@ -101,7 +101,12 @@ public class DockerContainer {
 	}
 
 	public void delete() {
-
+		try {
+			client.delete(containerID, true, true);
+		} catch (DockerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public Model serializeModel() {
