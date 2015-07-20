@@ -38,8 +38,7 @@ public class DockerAdapterControl extends AdapterControl {
 
 	@Override
 	public AbstractAdapter createAdapterInstance(Model mod, Resource res) {
-		// TODO: Construct DockerAdapter using mod and res
-		return null;
+		return new DockerAdapter(mod, res);
 	}
 
 	@Override
