@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
+import org.fiteagle.adapters.containers.docker.internal.DockerClient;
 import org.fiteagle.api.core.Config;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 
@@ -17,6 +18,7 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 public class DockerAdapter extends AbstractAdapter {
+	private DockerClient client;
 	private final HashMap<String, DockerContainer> instances;
 
 	public DockerAdapter(Model model, Resource res) {
@@ -55,13 +57,16 @@ public class DockerAdapter extends AbstractAdapter {
 //				Property p = adapterTBox.getProperty(propertiesIterator.next().getURI());
 //			}
 		}
+
+		// Instantiate docker client
+		client = new DockerClient("localhost", 8080);
 	}
 
 	@Override
 	public Model createInstance(String instanceURI, Model resourceModel)
 		throws ProcessingException, InvalidRequestException
 	{
-		DockerContainer container = new DockerContainer();
+		DockerContainer container = new DockerContainer(client);
 		instances.put(instanceURI, container);
 
 		container.update(resourceModel.getResource(instanceURI));
