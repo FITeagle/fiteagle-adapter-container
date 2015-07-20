@@ -3,6 +3,7 @@ package org.fiteagle.adapters.containers.docker;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.UUID;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
@@ -13,16 +14,22 @@ import org.fiteagle.api.core.MessageBusOntologyModel;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.NodeIterator;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 public class DockerAdapter extends AbstractAdapter {
 	private DockerClient client;
+	private LinkedList<Property> properties;
+
 	private final HashMap<String, DockerContainer> instances;
 
 	public DockerAdapter(Model model, Resource res) {
 		instances = new HashMap<String, DockerContainer>();
+		properties = new LinkedList<Property>();
+
 		uuid = UUID.randomUUID().toString();
 
 		// Configure description
@@ -52,10 +59,10 @@ public class DockerAdapter extends AbstractAdapter {
 
 			adapterABox.addProperty(Omn_lifecycle.canImplement, resource);
 
-//			ResIterator propertiesIterator = adapterTBox.listSubjectsWithProperty(RDFS.domain, resource);
-//			while (propertiesIterator.hasNext()) {
-//				Property p = adapterTBox.getProperty(propertiesIterator.next().getURI());
-//			}
+			ResIterator propertiesIterator = adapterTBox.listSubjectsWithProperty(RDFS.domain, resource);
+			while (propertiesIterator.hasNext()) {
+				properties.add(adapterTBox.getProperty(propertiesIterator.next().getURI()));
+			}
 		}
 
 		// Instantiate docker client
@@ -66,7 +73,12 @@ public class DockerAdapter extends AbstractAdapter {
 	public Model createInstance(String instanceURI, Model resourceModel)
 		throws ProcessingException, InvalidRequestException
 	{
-		DockerContainer container = new DockerContainer(client);
+		DockerContainer container = new DockerContainer(
+			instanceURI,
+			getAdapterManagedResources().get(0),
+			properties,
+			client
+		);
 		instances.put(instanceURI, container);
 
 		container.update(resourceModel.getResource(instanceURI));

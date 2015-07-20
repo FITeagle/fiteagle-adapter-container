@@ -23,3 +23,10 @@ docker:image
 	rdfs:domain docker:Container;
 	rdfs:label  "Image identifier"@en;
 	rdfs:range  xsd:string.
+
+docker:command
+	a           owl:DatatypeProperty;
+	a           owl:FunctionalProperty;
+	rdfs:domain docker:Container;
+	rdfs:label  "Command to be run inside the container"@en;
+	rdfs:range  xsd:string.
