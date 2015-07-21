@@ -66,7 +66,7 @@ public class DockerAdapter extends AbstractAdapter {
 		}
 
 		// Instantiate docker client
-		client = new DockerClient("localhost", 8080);
+		client = new DockerClient("localhost", 1337);
 	}
 
 	@Override
