@@ -3,6 +3,8 @@ package org.fiteagle.adapters.containers.docker;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
+import javax.ejb.Singleton;
+import javax.ejb.Startup;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.AdapterControl;
@@ -17,7 +19,12 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 
+@Singleton
+@Startup
 public class DockerAdapterControl extends AdapterControl {
+//@Inject
+//protected OpenstackAdapterMDBSender mdbSender;
+
 	@PostConstruct
 	void init() {
 		adapterModel = OntologyModelUtil.loadModel(
