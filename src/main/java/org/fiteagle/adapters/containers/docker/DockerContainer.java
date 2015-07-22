@@ -78,6 +78,8 @@ public class DockerContainer {
 		if (resource == null || !resource.hasProperty(adapter.propImage) || !resource.hasProperty(adapter.propCommand))
 			return null;
 
+		// TODO: Check if requested image is available on the Docker endpoint
+
 		ContainerConfiguration config = new ContainerConfiguration(
 			null,
 			resource.getProperty(adapter.propImage).getObject().asLiteral().getString()
