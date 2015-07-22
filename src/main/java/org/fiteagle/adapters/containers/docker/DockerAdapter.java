@@ -16,11 +16,14 @@ import org.fiteagle.api.core.MessageBusOntologyModel;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.NodeIterator;
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 public class DockerAdapter extends AbstractAdapter {
+	public final Property propConfig, propImage, propCommand, propPortMap;
+
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	private final HashMap<String, DockerContainer> instances;
 
@@ -57,6 +60,14 @@ public class DockerAdapter extends AbstractAdapter {
 			Resource resource = resourceIterator.next().asResource();
 			adapterABox.addProperty(Omn_lifecycle.canImplement, resource);
 		}
+
+		// Find properties
+		String dockerPrefix = model.getNsPrefixURI("docker");
+
+		propConfig  = model.getProperty(dockerPrefix, "config");
+		propImage   = model.getProperty(dockerPrefix, "image");
+		propCommand = model.getProperty(dockerPrefix, "command");
+		propPortMap = model.getProperty(dockerPrefix, "portMap");
 
 		// Instantiate docker client
 		client = new DockerClient("localhost", 1337);

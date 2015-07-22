@@ -10,7 +10,6 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
@@ -34,22 +33,19 @@ public class DockerContainer {
 		instanceResource = resource;
 	}
 
-	public boolean update(Model resource) {
-		StmtIterator stmtIter = resource.listStatements();
-		while (stmtIter.hasNext()) {
-			Statement stmt = stmtIter.next();
+	public boolean update(Model updateModel) {
+		Resource newState = updateModel.getResource(instanceIdentifier);
 
-			if (!stmt.getSubject().getURI().equals(instanceIdentifier))
-				continue;
-
-			Property prop = stmt.getPredicate();
-			if (prop.getURI().equals("http://docker.com/schema/docker#containerConfig")) {
-				StmtIterator propIter = stmt.getResource().listProperties();
-				while (propIter.hasNext()) {
-					logger.info(propIter.next().getString());
-				}
-			}
+		if (newState == null || !newState.hasProperty(adapter.propConfig)) {
+			logger.severe("Invalid update model");
+			return false;
 		}
+
+		Statement configStatement = newState.getProperty(adapter.propConfig);
+
+		logger.info(configStatement.getObject().toString());
+		logger.info(configStatement.getPredicate().toString());
+		logger.info(configStatement.getSubject().toString());
 
 		return true;
 	}
