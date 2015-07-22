@@ -17,9 +17,9 @@
 		<ns1:hasID>ubuntu-1</ns1:hasID>
 		<ns0:isResourceOf
 			rdf:resource="http://open-multinet.info/ontology/examples/docker-test-1" />
-		<ns1:implementedBy rdf:resource="http://localhost/resource/DockerAdapter-1" />
-		<docker:name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">ubuntu-1</docker:name>
-		<docker:image rdf:datatype="http://www.w3.org/2001/XMLSchema#string">ubuntu</docker:image>
-		<docker:command rdf:datatype="http://www.w3.org/2001/XMLSchema#string">/bin/bash</docker:command>
+		<ns1:implementedBy
+			rdf:resource="http://localhost/resource/DockerAdapter-1" />
+		<docker:containerConfig
+			rdf:resource="http://docker.com/schema/docker#ubuntu" />
 	</docker:Container>
 </rdf:RDF>

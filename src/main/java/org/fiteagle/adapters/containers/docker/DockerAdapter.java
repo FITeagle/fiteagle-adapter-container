@@ -3,7 +3,6 @@ package org.fiteagle.adapters.containers.docker;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -17,23 +16,18 @@ import org.fiteagle.api.core.MessageBusOntologyModel;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.NodeIterator;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 public class DockerAdapter extends AbstractAdapter {
-	private Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final HashMap<String, DockerContainer> instances;
 
 	private DockerClient client;
-	private LinkedList<Property> properties;
-
-	private final HashMap<String, DockerContainer> instances;
 
 	public DockerAdapter(Model model, Resource res) {
 		instances = new HashMap<String, DockerContainer>();
-		properties = new LinkedList<Property>();
 
 		uuid = UUID.randomUUID().toString();
 
@@ -43,7 +37,7 @@ public class DockerAdapter extends AbstractAdapter {
 
 		adapterABox.addProperty(RDF.type, getAdapterClass());
 		adapterABox.addProperty(RDFS.label, adapterABox.getLocalName());
-		adapterABox.addProperty(RDFS.comment, "Docker adapter");
+		adapterABox.addProperty(RDFS.comment, "Docker Adapter");
 
 		adapterABox.addLiteral(MessageBusOntologyModel.maxInstances, 10);
 
@@ -61,13 +55,7 @@ public class DockerAdapter extends AbstractAdapter {
 		NodeIterator resourceIterator = this.adapterTBox.listObjectsOfProperty(Omn_lifecycle.implements_);
 		if (resourceIterator.hasNext()) {
 			Resource resource = resourceIterator.next().asResource();
-
 			adapterABox.addProperty(Omn_lifecycle.canImplement, resource);
-
-			ResIterator propertiesIterator = adapterTBox.listSubjectsWithProperty(RDFS.domain, resource);
-			while (propertiesIterator.hasNext()) {
-				properties.add(adapterTBox.getProperty(propertiesIterator.next().getURI()));
-			}
 		}
 
 		// Instantiate docker client
@@ -87,10 +75,9 @@ public class DockerAdapter extends AbstractAdapter {
 		throws ProcessingException, InvalidRequestException
 	{
 		DockerContainer container = new DockerContainer(
+			this,
 			instanceURI,
-			getAdapterManagedResources().get(0),
-			properties,
-			client
+			getAdapterManagedResources().get(0)
 		);
 		instances.put(instanceURI, container);
 

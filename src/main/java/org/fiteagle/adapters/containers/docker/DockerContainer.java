@@ -3,12 +3,7 @@ package org.fiteagle.adapters.containers.docker;
 import info.openmultinet.ontology.vocabulary.Omn;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
-import java.util.LinkedList;
 import java.util.logging.Logger;
-
-import org.fiteagle.adapters.containers.docker.internal.ContainerConfiguration;
-import org.fiteagle.adapters.containers.docker.internal.DockerClient;
-import org.fiteagle.adapters.containers.docker.internal.DockerException;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -21,102 +16,46 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 public class DockerContainer {
-	private static final String COMMAND_PROPERTY = "command";
-	private static final String IMAGE_PROPERTY = "image";
-	private static final String NAME_PROPERTY = "name";
+	private final Logger logger = Logger.getLogger(getClass().getName());
 
-	private Logger logger = Logger.getLogger(getClass().getName());
-
-	private DockerClient client;
+	private DockerAdapter adapter;
 
 	private Resource instanceResource;
 	private String instanceIdentifier;
-	private LinkedList<Property> instanceProperties;
-
-	private String containerID = null;
-	private String containerName = null;
-	private String containerImage = null;
-	private String containerCommand = null;
 
 	public DockerContainer(
+		DockerAdapter parent,
 		String uri,
-		Resource resource,
-		LinkedList<Property> properties,
-		DockerClient dockerClient
+		Resource resource
 	) {
+		adapter = parent;
+
 		instanceIdentifier = uri;
 		instanceResource = resource;
-		instanceProperties = properties;
-
-		client = dockerClient;
-
-		logger.info("[" + instanceIdentifier + "] Constructed");
 	}
 
 	public boolean update(Model resource) {
-		logger.info("[" + instanceIdentifier + "] Update");
-		String wantedImage = null, wantedCommand = null, wantedName = null;
+		StmtIterator stmtIter = resource.listStatements();
+		while (stmtIter.hasNext()) {
+			Statement stmt = stmtIter.next();
 
-		StmtIterator iter = resource.listStatements();
-		while (iter.hasNext()) {
-			Statement stmt = iter.next();
 			if (!stmt.getSubject().getURI().equals(instanceIdentifier))
 				continue;
 
-			String localName = stmt.getPredicate().getLocalName();
-
-			if (localName.equals(COMMAND_PROPERTY)) {
-				wantedCommand = stmt.getString();
-			} else if (localName.equals(IMAGE_PROPERTY)) {
-				wantedImage = stmt.getString();
-			} else if (localName.equals(NAME_PROPERTY)) {
-				wantedName = stmt.getString();
+			Property prop = stmt.getPredicate();
+			if (prop.getURI().equals("http://docker.com/schema/docker#containerConfig")) {
+				StmtIterator propIter = stmt.getResource().listProperties();
+				while (propIter.hasNext()) {
+					logger.info(propIter.next().getString());
+				}
 			}
 		}
 
-		if (wantedImage == null || wantedCommand == null || wantedName == null) {
-			logger.info("[" + instanceIdentifier + "] Invalid request");
-			return false;
-		}
-
-		// Check if we really need to recreate the container
-		boolean newContainer = containerID == null;
-		newContainer |= containerName == null    || !containerName.equals(wantedName);
-		newContainer |= containerImage == null   || !containerImage.equals(wantedImage);
-		newContainer |= containerCommand == null || !containerCommand.equals(wantedCommand);
-
-		if (newContainer) {
-			// Assemble configuration
-			ContainerConfiguration conf = new ContainerConfiguration(wantedName, wantedImage);
-			conf.setCommandEasily(wantedCommand);
-
-			// Delete if we manage a container already
-			if (containerID != null)
-				delete();
-
-			// Try to start the new container
-			try {
-				logger.info("[" + instanceIdentifier + "] Configuration: " + conf.toJsonObject().toString());
-				containerID = client.create(conf);
-				return (containerID != null);
-			} catch (DockerException e) {
-				e.printStackTrace();
-				return false;
-			}
-		} else {
-			return true;
-		}
+		return true;
 	}
 
 	public void delete() {
-		try {
-			if (containerID != null) {
-				logger.info("[" + instanceIdentifier + "] Delete");
-				client.delete(containerID, true, true);
-			}
-		} catch (DockerException e) {
-			e.printStackTrace();
-		}
+//		logger.info("[" + instanceIdentifier + "] Delete");
 	}
 
 	public Model serializeModel() {
@@ -133,19 +72,6 @@ public class DockerContainer {
     	);
         property.addProperty(RDF.type, OWL.FunctionalProperty);
         resource.addProperty(property, Omn_lifecycle.Ready);
-
-        // Add container properties
-        for (Property prop: instanceProperties) {
-            String localName = prop.getLocalName();
-
-            if (localName.equals(NAME_PROPERTY)) {
-    			resource.addLiteral(prop, containerName == null ? "" : containerName);
-            } else if (localName.equals(IMAGE_PROPERTY)) {
-    			resource.addLiteral(prop, containerImage == null ? "" : containerImage);
-            } else if (localName.equals(COMMAND_PROPERTY)) {
-        		resource.addLiteral(prop, containerCommand == null ? "" : containerCommand);
-            }
-        }
 
 		return resource.getModel();
 	}
