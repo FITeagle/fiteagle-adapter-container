@@ -6,7 +6,7 @@
 	<groupId>org.fiteagle.adapters</groupId>
 	<artifactId>containers</artifactId>
 	<packaging>war</packaging>
-	<version>0.1-SNAPSHOT</version>
+	<version>0.0-SNAPSHOT</version>
 	<name>containers</name>
 	<url>http://maven.apache.org</url>
 
