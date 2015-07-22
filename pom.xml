@@ -6,9 +6,15 @@
 	<groupId>org.fiteagle.adapters</groupId>
 	<artifactId>containers</artifactId>
 	<packaging>war</packaging>
-	<version>1.0-SNAPSHOT</version>
+	<version>0.1-SNAPSHOT</version>
 	<name>containers</name>
 	<url>http://maven.apache.org</url>
+
+	<parent>
+		<groupId>org.fiteagle</groupId>
+		<artifactId>adapters</artifactId>
+		<version>0.1-SNAPSHOT</version>
+	</parent>
 
 	<!-- Dependencies -->
 	<dependencies>
@@ -52,7 +58,7 @@
 			<plugin>
 				<groupId>org.wildfly.plugins</groupId>
 				<artifactId>wildfly-maven-plugin</artifactId>
-				<!-- <version>${wildfly.version}</version> -->
+				<version>${wildfly.version}</version>
 				<configuration>
 					<skip>false</skip>
 					<filename>${project.build.finalName}.war</filename>
