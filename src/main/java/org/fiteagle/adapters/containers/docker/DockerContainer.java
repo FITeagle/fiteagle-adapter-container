@@ -68,15 +68,14 @@ public class DockerContainer {
 			}
 		}
 
-		wantedName    = wantedName    == null ? containerName    : wantedName;
-		wantedImage   = wantedImage   == null ? containerImage   : wantedImage;
-		wantedCommand = wantedCommand == null ? containerCommand : wantedCommand;
+		if (wantedImage == null || wantedCommand == null || wantedName == null)
+			return false;
 
 		// Check if we really need to recreate the container
 		boolean newContainer = containerID == null;
-		newContainer |= !containerName.equals(wantedName);
-		newContainer |= !containerImage.equals(wantedImage);
-		newContainer |= !containerCommand.equals(wantedCommand);
+		newContainer |= containerName == null    || !containerName.equals(wantedName);
+		newContainer |= containerImage == null   || !containerImage.equals(wantedImage);
+		newContainer |= containerCommand == null || !containerCommand.equals(wantedCommand);
 
 		if (newContainer) {
 			// Assemble configuration
@@ -129,11 +128,11 @@ public class DockerContainer {
             String localName = prop.getLocalName();
 
             if (localName.equals(NAME_PROPERTY)) {
-    			resource.addLiteral(prop, containerName);
+    			resource.addLiteral(prop, containerName == null ? "" : containerName);
             } else if (localName.equals(IMAGE_PROPERTY)) {
-    			resource.addLiteral(prop, containerImage);
+    			resource.addLiteral(prop, containerImage == null ? "" : containerImage);
             } else if (localName.equals(COMMAND_PROPERTY)) {
-        		resource.addLiteral(prop, containerCommand);
+        		resource.addLiteral(prop, containerCommand == null ? "" : containerCommand);
             }
         }
 

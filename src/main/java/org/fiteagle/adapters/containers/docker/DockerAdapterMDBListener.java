@@ -25,28 +25,14 @@ import org.fiteagle.api.core.IMessageBus;
 			propertyName = "messageSelector",
 			propertyValue =
 				IMessageBus.METHOD_TARGET
-				+ " = '"
-				+ "http://open-multinet.info/ontology/omn-domain-pc#VMServer"
-				+ "'"
-				+ "AND ("
-				+ IMessageBus.METHOD_TYPE
-				+ " = '"
-				+ IMessageBus.TYPE_CREATE
-				+ "' "
-				+ "OR "
-				+ IMessageBus.METHOD_TYPE
-				+ " = '"
-				+ IMessageBus.TYPE_CONFIGURE
-				+ "' "
-				+ "OR "
-				+ IMessageBus.METHOD_TYPE
-				+ " = '"
-				+ IMessageBus.TYPE_GET
-				+ "' "
-				+ "OR "
-				+ IMessageBus.METHOD_TYPE
-				+ " = '"
-				+ IMessageBus.TYPE_DELETE
+				+ " = 'http://docker.com/schema/docker#Adapter' AND ("
+				+ IMessageBus.METHOD_TYPE + " = '" + IMessageBus.TYPE_CREATE
+				+ "' OR "
+				+ IMessageBus.METHOD_TYPE + " = '" + IMessageBus.TYPE_CONFIGURE
+				+ "' OR "
+				+ IMessageBus.METHOD_TYPE + " = '" + IMessageBus.TYPE_GET
+				+ "' OR "
+				+ IMessageBus.METHOD_TYPE + " = '" + IMessageBus.TYPE_DELETE
 				+ "')"
 		),
 		@ActivationConfigProperty(
