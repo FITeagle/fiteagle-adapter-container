@@ -5,11 +5,14 @@ import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
 import java.util.logging.Logger;
 
+import org.fiteagle.adapters.containers.docker.internal.ContainerConfiguration;
+import org.fiteagle.adapters.containers.docker.internal.DockerClient;
+import org.fiteagle.adapters.containers.docker.internal.DockerException;
+
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
@@ -22,6 +25,9 @@ public class DockerContainer {
 	private Resource instanceResource;
 	private String instanceIdentifier;
 
+	private String containerID = null;
+	private ContainerConfiguration containerConfig = null;
+
 	public DockerContainer(
 		DockerAdapter parent,
 		String uri,
@@ -33,25 +39,64 @@ public class DockerContainer {
 		instanceResource = resource;
 	}
 
-	public boolean update(Model updateModel) {
+	public void update(Model updateModel) {
 		Resource newState = updateModel.getResource(instanceIdentifier);
 
 		if (newState == null || !newState.hasProperty(adapter.propConfig)) {
 			logger.severe("Invalid update model");
-			return false;
+			return;
 		}
 
-		Statement configStatement = newState.getProperty(adapter.propConfig);
+		String configURI = newState.getProperty(adapter.propConfig).getObject().asResource().getURI();
+		Resource configResource = adapter.getAdapterDescriptionModel().getResource(configURI);
 
-		logger.info(configStatement.getObject().toString());
-		logger.info(configStatement.getPredicate().toString());
-		logger.info(configStatement.getSubject().toString());
+		ContainerConfiguration newConfig = configurationFromResource(configResource);
 
-		return true;
+		if (newConfig != null && (containerID == null || containerConfig == null || !newConfig.equals(containerConfig))) {
+			try {
+//				This is how it should be, but we cant do it without having conflicting port maps:
+//				String newID = adapter.getDockerClient().create(newConfig);
+//
+//				if (newID != null && !newID.isEmpty()) {
+//					delete();
+//
+//					containerID = newID;
+//					containerConfig = newConfig;
+//				}
+
+				delete();
+
+				containerID = adapter.getDockerClient().create(newConfig);
+				containerConfig = newConfig;
+			} catch (DockerException e) {
+				logger.throwing(DockerClient.class.getName(), "create", e);
+			}
+		}
+	}
+
+	public ContainerConfiguration configurationFromResource(Resource resource) {
+		if (resource == null || !resource.hasProperty(adapter.propImage) || !resource.hasProperty(adapter.propCommand))
+			return null;
+
+		ContainerConfiguration config = new ContainerConfiguration(
+			null,
+			resource.getProperty(adapter.propImage).getObject().asLiteral().getString()
+		);
+
+		config.setCommandEasily(resource.getProperty(adapter.propCommand).getObject().asLiteral().getString());
+
+		return config;
 	}
 
 	public void delete() {
-//		logger.info("[" + instanceIdentifier + "] Delete");
+		if (containerID == null)
+			return;
+
+		try {
+			adapter.getDockerClient().delete(containerID, true, true);
+		} catch (DockerException e) {
+			logger.throwing(DockerClient.class.getName(), "delete", e);
+		}
 	}
 
 	public Model serializeModel() {
@@ -68,6 +113,8 @@ public class DockerContainer {
     	);
         property.addProperty(RDF.type, OWL.FunctionalProperty);
         resource.addProperty(property, Omn_lifecycle.Ready);
+
+//        resource.addProperty(adapter.propConfig, "http://docker.com/schema/docker#ubuntu");
 
 		return resource.getModel();
 	}

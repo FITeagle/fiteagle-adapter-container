@@ -19,7 +19,7 @@
 			rdf:resource="http://open-multinet.info/ontology/examples/docker-test-1" />
 		<ns1:implementedBy
 			rdf:resource="http://localhost/resource/DockerAdapter-1" />
-		<docker:containerConfig
+		<docker:config
 			rdf:resource="http://docker.com/schema/docker#ubuntu" />
 	</docker:Container>
 </rdf:RDF>

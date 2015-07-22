@@ -73,12 +73,16 @@ public class DockerAdapter extends AbstractAdapter {
 		client = new DockerClient("localhost", 1337);
 
 		try {
-			VersionInformation verInfo= client.version();
+			VersionInformation verInfo = client.version();
 			logger.info(verInfo.toString());
 		} catch (DockerException e) {
 			logger.severe("Failed to get version information");
 			e.printStackTrace();
 		}
+	}
+
+	public DockerClient getDockerClient() {
+		return client;
 	}
 
 	@Override
@@ -106,10 +110,8 @@ public class DockerAdapter extends AbstractAdapter {
 		if (container == null)
 			return ModelFactory.createDefaultModel();
 
-		if (container.update(resourceModel))
-			return container.serializeModel();
-		else
-			return ModelFactory.createDefaultModel();
+		container.update(resourceModel);
+		return container.serializeModel();
 	}
 
 	@Override
