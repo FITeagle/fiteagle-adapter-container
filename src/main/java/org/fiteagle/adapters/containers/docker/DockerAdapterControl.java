@@ -43,12 +43,14 @@ public class DockerAdapterControl extends AdapterControl {
 
 	@Override
 	protected void addAdapterProperties(Map<String, String> arg0) {
-		// TODO Auto-generated method stub
+
 	}
 
 	@Override
 	public AbstractAdapter createAdapterInstance(Model mod, Resource res) {
-		return new DockerAdapter(mod, res);
+		DockerAdapter adapter = new DockerAdapter(mod, res);
+		adapterInstances.put(adapter.getId(), adapter);
+		return adapter;
 	}
 
 	@Override
