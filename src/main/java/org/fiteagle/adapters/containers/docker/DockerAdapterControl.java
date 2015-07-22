@@ -1,15 +1,16 @@
 package org.fiteagle.adapters.containers.docker;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
+import javax.inject.Inject;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.AdapterControl;
 import org.fiteagle.abstractAdapter.dm.IAbstractAdapter;
-import org.fiteagle.api.core.Config;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.OntologyModelUtil;
 
@@ -22,8 +23,10 @@ import com.hp.hpl.jena.rdf.model.Resource;
 @Singleton
 @Startup
 public class DockerAdapterControl extends AdapterControl {
-//@Inject
-//protected OpenstackAdapterMDBSender mdbSender;
+	@Inject
+	protected DockerAdapterMDBSender adapterSender;
+
+	private Logger logger = Logger.getLogger(getClass().getName());
 
 	@PostConstruct
 	void init() {
@@ -32,7 +35,7 @@ public class DockerAdapterControl extends AdapterControl {
 			IMessageBus.SERIALIZATION_TURTLE
 		);
 
-		adapterInstancesConfig = new Config();
+		adapterInstancesConfig = readConfig("DockerAdapter");
 
 		createAdapterInstances();
 		publishInstances();
@@ -80,6 +83,8 @@ public class DockerAdapterControl extends AdapterControl {
     		String comID = comIDElem.getAsJsonPrimitive().getAsString();
 
     		if (!comID.isEmpty()) {
+    			logger.info("Instantiating resource '" + comID + "'");
+
     			createAdapterInstance(
 					adapterModel,
 					ModelFactory.createDefaultModel().createResource(comID)

@@ -18,6 +18,21 @@ public class DockerClient {
 	}
 
 	/**
+	 * Request version information
+	 */
+	public VersionInformation version()
+		throws DockerException
+	{
+		try {
+			return ResponseParser.version(
+				httpClient.execute(requestBuilder.version())
+			);
+		} catch (Exception e) {
+			throw new DockerException(e);
+		}
+	}
+
+	/**
 	 * Create a new container using the given information.
 	 */
 	public String create(ContainerConfiguration cci)

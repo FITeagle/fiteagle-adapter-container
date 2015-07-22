@@ -36,6 +36,43 @@ public abstract class ResponseParser {
 	}
 
 	/**
+	 * Parse response to version request.
+	 * @return Version information
+	 */
+	public static VersionInformation version(HttpResponse response)
+		throws DockerException
+	{
+		int statusCode = response.getStatusLine().getStatusCode();
+		if (statusCode != 200) {
+			switch (statusCode) {
+				case 500:
+					throw new DockerException("Server error");
+
+				default:
+					throw new DockerException("Unknown status code");
+			}
+		}
+
+		JsonElement jsonResult = null;
+
+		// Obtain resulting JSON object
+		try {
+			jsonResult = new JsonParser().parse(
+				new InputStreamReader(response.getEntity().getContent())
+			);
+		} catch (Exception e) {
+			throw new DockerException(e);
+		}
+
+		// Validate the result schema
+		if (jsonResult == null || !jsonResult.isJsonObject()) {
+			throw new DockerException("Unexpected result schema");
+		}
+
+		return VersionInformation.fromJSON(jsonResult.getAsJsonObject());
+	}
+
+	/**
 	 * Parse response to a list-container request.
 	 * @return List of containers
 	 */

@@ -5,9 +5,12 @@ import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.adapters.containers.docker.internal.DockerClient;
+import org.fiteagle.adapters.containers.docker.internal.DockerException;
+import org.fiteagle.adapters.containers.docker.internal.VersionInformation;
 import org.fiteagle.api.core.Config;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 
@@ -21,6 +24,8 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 public class DockerAdapter extends AbstractAdapter {
+	private Logger logger = Logger.getLogger(getClass().getName());
+
 	private DockerClient client;
 	private LinkedList<Property> properties;
 
@@ -38,7 +43,7 @@ public class DockerAdapter extends AbstractAdapter {
 
 		adapterABox.addProperty(RDF.type, getAdapterClass());
 		adapterABox.addProperty(RDFS.label, adapterABox.getLocalName());
-		adapterABox.addProperty(RDFS.comment, "A motor garage adapter that can simulate different dynamic motor resources.");
+		adapterABox.addProperty(RDFS.comment, "Docker adapter");
 
 		adapterABox.addLiteral(MessageBusOntologyModel.maxInstances, 10);
 
@@ -67,6 +72,14 @@ public class DockerAdapter extends AbstractAdapter {
 
 		// Instantiate docker client
 		client = new DockerClient("localhost", 1337);
+
+		try {
+			VersionInformation verInfo= client.version();
+			logger.info(verInfo.toString());
+		} catch (DockerException e) {
+			logger.severe("Failed to get version information");
+			e.printStackTrace();
+		}
 	}
 
 	@Override
