@@ -1,7 +1,6 @@
 package org.fiteagle.adapters.containers.docker;
 
 import java.util.Map;
-import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
@@ -25,8 +24,6 @@ import com.hp.hpl.jena.rdf.model.Resource;
 public class DockerAdapterControl extends AdapterControl {
 	@Inject
 	protected DockerAdapterMDBSender adapterSender;
-
-	private Logger logger = Logger.getLogger(getClass().getName());
 
 	@PostConstruct
 	void init() {
@@ -85,8 +82,6 @@ public class DockerAdapterControl extends AdapterControl {
     		String comID = comIDElem.getAsJsonPrimitive().getAsString();
 
     		if (!comID.isEmpty()) {
-    			logger.info("Instantiating resource '" + comID + "'");
-
     			createAdapterInstance(
 					adapterModel,
 					ModelFactory.createDefaultModel().createResource(comID)

@@ -4,6 +4,7 @@ import info.openmultinet.ontology.vocabulary.Omn;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
 import java.util.LinkedList;
+import java.util.logging.Logger;
 
 import org.fiteagle.adapters.containers.docker.internal.ContainerConfiguration;
 import org.fiteagle.adapters.containers.docker.internal.DockerClient;
@@ -23,6 +24,8 @@ public class DockerContainer {
 	private static final String COMMAND_PROPERTY = "command";
 	private static final String IMAGE_PROPERTY = "image";
 	private static final String NAME_PROPERTY = "name";
+
+	private Logger logger = Logger.getLogger(getClass().getName());
 
 	private DockerClient client;
 
@@ -46,9 +49,12 @@ public class DockerContainer {
 		instanceProperties = properties;
 
 		client = dockerClient;
+
+		logger.info("[" + instanceIdentifier + "] Constructed");
 	}
 
 	public boolean update(Model resource) {
+		logger.info("[" + instanceIdentifier + "] Update");
 		String wantedImage = null, wantedCommand = null, wantedName = null;
 
 		StmtIterator iter = resource.listStatements();
@@ -68,8 +74,10 @@ public class DockerContainer {
 			}
 		}
 
-		if (wantedImage == null || wantedCommand == null || wantedName == null)
+		if (wantedImage == null || wantedCommand == null || wantedName == null) {
+			logger.info("[" + instanceIdentifier + "] Invalid request");
 			return false;
+		}
 
 		// Check if we really need to recreate the container
 		boolean newContainer = containerID == null;
@@ -88,6 +96,7 @@ public class DockerContainer {
 
 			// Try to start the new container
 			try {
+				logger.info("[" + instanceIdentifier + "] Configuration: " + conf.toJsonObject().toString());
 				containerID = client.create(conf);
 				return (containerID != null);
 			} catch (DockerException e) {
@@ -101,9 +110,11 @@ public class DockerContainer {
 
 	public void delete() {
 		try {
-			client.delete(containerID, true, true);
+			if (containerID != null) {
+				logger.info("[" + instanceIdentifier + "] Delete");
+				client.delete(containerID, true, true);
+			}
 		} catch (DockerException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

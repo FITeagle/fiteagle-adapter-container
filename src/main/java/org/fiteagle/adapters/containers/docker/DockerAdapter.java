@@ -86,8 +86,6 @@ public class DockerAdapter extends AbstractAdapter {
 	public Model createInstance(String instanceURI, Model resourceModel)
 		throws ProcessingException, InvalidRequestException
 	{
-		logger.info("createInstance(" + instanceURI + ", " + resourceModel.toString() + ")");
-
 		DockerContainer container = new DockerContainer(
 			instanceURI,
 			getAdapterManagedResources().get(0),
