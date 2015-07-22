@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:ns0="http://open-multinet.info/ontology/omn#"
+	xmlns:ns1="http://open-multinet.info/ontology/omn-lifecycle#"
+	xmlns:docker="http://docker.com/schema/docker#">
+	<owl:NamedIndividual
+		rdf:about="http://open-multinet.info/ontology/examples/docker-test-1">
+		<rdf:type rdf:resource="http://open-multinet.info/ontology/omn-lifecycle#Request" />
+		<rdf:type rdf:resource="http://open-multinet.info/ontology/omn#Topology" />
+		<ns0:hasResource
+			rdf:resource="http://open-multinet.info/ontology/examples/docker/ubuntu-1" />
+	</owl:NamedIndividual>
+	<docker:Container
+		rdf:about="http://open-multinet.info/ontology/examples/docker/ubuntu-1">
+		<ns1:hasID>ubuntu-1</ns1:hasID>
+		<ns0:isResourceOf
+			rdf:resource="http://open-multinet.info/ontology/examples/docker-test-1" />
+		<ns1:implementedBy rdf:resource="http://localhost/resource/DockerAdapter-1" />
+		<docker:name rdf:datatype="http://www.w3.org/2001/XMLSchema#string">ubuntu-1</docker:name>
+		<docker:image rdf:datatype="http://www.w3.org/2001/XMLSchema#string">ubuntu</docker:image>
+		<docker:command rdf:datatype="http://www.w3.org/2001/XMLSchema#string">/bin/bash</docker:command>
+	</docker:Container>
+</rdf:RDF>
