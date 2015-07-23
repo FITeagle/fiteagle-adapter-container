@@ -50,6 +50,8 @@ public class DockerContainer {
 	}
 
 	public void update(Model updateModel) {
+		logger.info("Received update request");
+
 		Resource newState = updateModel.getResource(instanceIdentifier);
 
 		if (newState == null || !newState.hasProperty(Omn_lifecycle.hasState)) {
