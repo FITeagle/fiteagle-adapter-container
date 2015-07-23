@@ -45,7 +45,7 @@ public class DockerAdapter extends AbstractAdapter {
 		adapterABox.addLiteral(MessageBusOntologyModel.maxInstances, 10);
 
 		adapterABox.addProperty(
-			adapterTBox.createProperty("http://www.w3.org/2003/01/geo/wgs84_pos#long"),
+			adapterTBox.createProperty("http://www.w3.org/2003/01/geo/wgs84_pos#lat"),
 			"52.555539"
 		);
 
