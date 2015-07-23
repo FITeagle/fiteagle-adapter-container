@@ -62,6 +62,11 @@ public class ContainerConfiguration {
 	 */
 	private JsonObject labels;
 
+	/**
+	 * Port maps
+	 */
+	private JsonObject portMaps;
+
 	public ContainerConfiguration(String containerName, String containerImage) {
 		host = domain = containerName;
 		image = containerImage;
@@ -69,6 +74,7 @@ public class ContainerConfiguration {
 		environment = new JsonArray();
 		command = new JsonArray();
 		labels = new JsonObject();
+		portMaps = new JsonObject();
 	}
 
 	/**
@@ -152,6 +158,21 @@ public class ContainerConfiguration {
 	}
 
 	/**
+	 * Map guest port to a port on the host side.
+	 */
+	public void bindPort(String protocol, int hostPort, int guestPort) {
+		String bindKey = protocol + "/" + String.valueOf(guestPort);
+
+		JsonObject hostBinding = new JsonObject();
+		hostBinding.add("HostPort", new JsonPrimitive(String.valueOf(hostPort)));
+
+		JsonArray bindValue = new JsonArray();
+		bindValue.add(hostBinding);
+
+		portMaps.add(bindKey, bindValue);
+	}
+
+	/**
 	 * Generate a JsonObject which can be sent to an API endpoint to create a new container.
 	 */
 	public JsonObject toJsonObject() {
@@ -178,6 +199,11 @@ public class ContainerConfiguration {
 		resultObject.add("Env", environment);
 		resultObject.add("Cmd", command);
 		resultObject.add("Labels", labels);
+
+		JsonObject hostConfig = new JsonObject();
+		hostConfig.add("PortBindings", portMaps);
+
+		resultObject.add("HostConfig", hostConfig);
 
 		return resultObject;
 	}

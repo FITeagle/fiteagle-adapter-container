@@ -19,7 +19,11 @@
 			rdf:resource="http://open-multinet.info/ontology/examples/docker-test-1" />
 		<ns1:implementedBy
 			rdf:resource="http://localhost/resource/DockerAdapter-1" />
-		<docker:config
-			rdf:resource="http://docker.com/schema/docker#ubuntu" />
+		<docker:image
+			rdf:datatype="http://www.w3.org/2001/XMLSchema#string">ubuntu:latest</docker:image>
+		<docker:command
+			rdf:datatype="http://www.w3.org/2001/XMLSchema#string">/bin/bash</docker:command>
+		<docker:portMap
+			rdf:datatype="http://www.w3.org/2001/XMLSchema#string">tcp:22:10022</docker:portMap>
 	</docker:Container>
 </rdf:RDF>

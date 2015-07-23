@@ -22,7 +22,7 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 public class DockerAdapter extends AbstractAdapter {
-	public final Property propConfig, propImage, propCommand, propPortMap;
+	public final Property propImage, propCommand, propPortMap;
 
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	private final HashMap<String, DockerContainer> instances;
@@ -64,7 +64,6 @@ public class DockerAdapter extends AbstractAdapter {
 		// Find properties
 		String dockerPrefix = model.getNsPrefixURI("docker");
 
-		propConfig  = model.getProperty(dockerPrefix, "config");
 		propImage   = model.getProperty(dockerPrefix, "image");
 		propCommand = model.getProperty(dockerPrefix, "command");
 		propPortMap = model.getProperty(dockerPrefix, "portMap");

@@ -18,41 +18,22 @@ docker:Container
 	rdfs:subClassOf             omn:Resource;
 	omn-lifecycle:implementedBy docker:Adapter.
 
-docker:config
-	a           owl:DatatypeProperty;
-	a           owl:FunctionalProperty;
-	rdfs:domain docker:Container;
-	rdfs:label  "Configuration"@en;
-	rdfs:range  docker:Configuration.
-
-# Configuration
-docker:Configuration
-	a          owl:Class;
-	rdfs:label "Container Configuration"@en.
-
 docker:image
 	a           owl:DatatypeProperty;
 	a           owl:FunctionalProperty;
-	rdfs:domain docker:Configuration;
+	rdfs:domain docker:Container;
 	rdfs:label  "Image"@en;
 	rdfs:range  xsd:string.
 
 docker:command
 	a           owl:DatatypeProperty;
 	a           owl:FunctionalProperty;
-	rdfs:domain docker:Configuration;
+	rdfs:domain docker:Container;
 	rdfs:label  "Command"@en;
 	rdfs:range  xsd:string.
 
 docker:portMap
 	a           owl:DatatypeProperty;
-	rdfs:domain docker:Configuration;
+	rdfs:domain docker:Container;
 	rdfs:label  "Port mapping"@en;
 	rdfs:range  xsd:string.
-
-# Configuration instances
-docker:ubuntu
-	a              docker:Configuration;
-	docker:image   "ubuntu:latest"^^xsd:string;
-	docker:command "/bin/bash"^^xsd:string;
-	docker:portMap "10022:22"^^xsd:string.

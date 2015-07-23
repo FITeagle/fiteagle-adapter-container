@@ -13,6 +13,8 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
@@ -25,8 +27,16 @@ public class DockerContainer {
 	private Resource instanceResource;
 	private String instanceIdentifier;
 
+	private enum State {
+		Dead,       // Empty
+		Configured, // Configuration created
+		Failed,     // Create/Start failed
+		Active      // Create/Start succeeded
+	}
+
+	private State containerState = State.Dead;
 	private String containerID = null;
-	private ContainerConfiguration containerConfig = null;
+	private ContainerConfiguration containerConf = null;
 
 	public DockerContainer(
 		DockerAdapter parent,
@@ -42,67 +52,132 @@ public class DockerContainer {
 	public void update(Model updateModel) {
 		Resource newState = updateModel.getResource(instanceIdentifier);
 
-		if (newState == null || !newState.hasProperty(adapter.propConfig)) {
+		if (newState == null || !newState.hasProperty(Omn_lifecycle.hasState)) {
 			logger.severe("Invalid update model");
 			return;
 		}
 
-		String configURI = newState.getProperty(adapter.propConfig).getObject().asResource().getURI();
-		Resource configResource = adapter.getAdapterDescriptionModel().getResource(configURI);
+		// Check resource state
+		Resource stateResource =
+			newState.getProperty(Omn_lifecycle.hasState).getObject().asResource();
 
-		ContainerConfiguration newConfig = configurationFromResource(configResource);
-
-		if (newConfig != null && (containerID == null || containerConfig == null || !newConfig.equals(containerConfig))) {
-			try {
-//				This is how it should be, but we cant do it without having conflicting port maps:
-//				String newID = adapter.getDockerClient().create(newConfig);
-//
-//				if (newID != null && !newID.isEmpty()) {
-//					delete();
-//
-//					containerID = newID;
-//					containerConfig = newConfig;
-//				}
-
-				delete();
-
-				containerID = adapter.getDockerClient().create(newConfig);
-				containerConfig = newConfig;
-			} catch (DockerException e) {
-				logger.throwing(DockerClient.class.getName(), "create", e);
-			}
-		}
+		if (stateResource.equals(Omn_lifecycle.Ready))
+			handleReady(newState);
+		else if (stateResource.equals(Omn_lifecycle.Uncompleted))
+			handleUncompleted(newState);
+		else
+			logger.severe("Unsupported lifecycle state: " + stateResource.toString());
 	}
 
-	public ContainerConfiguration configurationFromResource(Resource resource) {
-		if (resource == null || !resource.hasProperty(adapter.propImage) || !resource.hasProperty(adapter.propCommand))
-			return null;
+	private void handleUncompleted(Resource newState) {
+		if (containerState == State.Active)
+			delete();
 
-		// TODO: Check if requested image is available on the Docker endpoint
+		configureFromResource(newState);
+	}
 
-		ContainerConfiguration config = new ContainerConfiguration(
-			null,
-			resource.getProperty(adapter.propImage).getObject().asLiteral().getString()
-		);
+	private void handleReady(Resource newState) {
+		handleUncompleted(newState);
 
-		config.setCommandEasily(resource.getProperty(adapter.propCommand).getObject().asLiteral().getString());
+		if (containerState == State.Configured && containerConf != null) {
+			try {
+				logger.info("Starting with configuration " + containerConf.toJsonObject().toString());
+				containerID = adapter.getDockerClient().create(containerConf);
 
-		return config;
+				if (containerID != null && adapter.getDockerClient().start(containerID))
+					containerState = State.Active;
+				else
+					containerState = State.Failed;
+			} catch (DockerException e) {
+				logger.throwing(DockerClient.class.getName(), "create/start", e);
+				containerState = State.Failed;
+			}
+		}
+
+		logger.info("State = " + containerState.toString());
 	}
 
 	public void delete() {
-		if (containerID == null)
-			return;
+		switch (containerState) {
+			case Dead:
+				break;
 
-		try {
-			adapter.getDockerClient().delete(containerID, true, true);
-		} catch (DockerException e) {
-			logger.throwing(DockerClient.class.getName(), "delete", e);
+			case Configured:
+				if (containerConf == null)
+					containerState = State.Dead;
+
+				break;
+
+			case Failed:
+				if (containerConf == null)
+					// An unconfigured container which failed to start? No shit.
+					containerState = State.Dead;
+				else
+					// Start failure might be caused by invalid configuration, we'll keep it anyway
+					containerState = State.Configured;
+
+				break;
+
+			case Active:
+				if (containerID != null) {
+					try {
+						adapter.getDockerClient().delete(containerID, true, true);
+					} catch (DockerException e) {
+						logger.throwing(DockerClient.class.getName(), "stop", e);
+					}
+				}
+
+				// Figure out if the container may stay configured
+				if (containerConf != null)
+					containerState = State.Configured;
+				else
+					containerState = State.Dead;
+
+				break;
 		}
+
+		containerID = null;
+		logger.info("State = " + containerState.toString());
+	}
+
+	private void configureFromResource(Resource newState) {
+		containerConf = new ContainerConfiguration(null, null);
+
+		// Image
+		if (newState.hasProperty(adapter.propImage)) {
+			Statement stmtImage = newState.getProperty(adapter.propImage);
+			containerConf.image = stmtImage.getObject().asLiteral().getString();
+		}
+
+		// Command
+		if (newState.hasProperty(adapter.propCommand)) {
+			Statement stmtImage = newState.getProperty(adapter.propCommand);
+			containerConf.setCommandEasily(stmtImage.getObject().asLiteral().getString());
+		}
+
+		// Port mappings
+		StmtIterator portMapIter = newState.listProperties(adapter.propPortMap);
+		while (portMapIter.hasNext()) {
+			String value = portMapIter.next().getObject().asLiteral().getString();
+			String[] segments = value.split(":");
+
+			if (segments.length > 2) {
+				try {
+					containerConf.bindPort(segments[0], Integer.parseInt(segments[2]), Integer.parseInt(segments[1]));
+				} catch (NumberFormatException e) {
+					logger.warning("Ignoring port map '" + value + "'");
+				}
+			} else {
+				logger.warning("Ignoring port map '" + value + "'");
+			}
+		}
+
+		containerState = State.Configured;
 	}
 
 	public Model serializeModel() {
-		Resource resource = ModelFactory.createDefaultModel().createResource(instanceIdentifier);
+		Model responseModel = ModelFactory.createDefaultModel();
+		Resource resource = responseModel.createResource(instanceIdentifier);
 
         resource.addProperty(RDF.type, instanceResource);
         resource.addProperty(RDF.type, Omn.Resource);
@@ -114,10 +189,27 @@ public class DockerContainer {
     		Omn_lifecycle.hasState.getLocalName()
     	);
         property.addProperty(RDF.type, OWL.FunctionalProperty);
-        resource.addProperty(property, Omn_lifecycle.Ready);
 
-//        resource.addProperty(adapter.propConfig, "http://docker.com/schema/docker#ubuntu");
+        switch (containerState) {
+	        case Dead:
+	    		resource.addProperty(property, Omn_lifecycle.NotReady);
+	    		break;
 
-		return resource.getModel();
+	        case Failed:
+	    		resource.addProperty(property, Omn_lifecycle.Failure);
+	    		break;
+
+	        case Configured:
+	    		resource.addProperty(property, Omn_lifecycle.Provisioned);
+	    		break;
+
+	        case Active:
+	        	resource.addProperty(property, Omn_lifecycle.Active);
+	        	break;
+        }
+
+        // TODO: Serialize properties
+
+		return responseModel;
 	}
 }
