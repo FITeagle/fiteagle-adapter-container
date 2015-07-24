@@ -16,14 +16,11 @@ import org.fiteagle.api.core.MessageBusOntologyModel;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.NodeIterator;
-import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 public class DockerAdapter extends AbstractAdapter {
-	public final Property propImage, propCommand, propPortMap;
-
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	private final HashMap<String, DockerContainer> instances;
 
@@ -31,7 +28,6 @@ public class DockerAdapter extends AbstractAdapter {
 
 	public DockerAdapter(Model model, Resource res) {
 		instances = new HashMap<String, DockerContainer>();
-
 		uuid = UUID.randomUUID().toString();
 
 		// Configure description
@@ -55,21 +51,18 @@ public class DockerAdapter extends AbstractAdapter {
 		);
 
 		// Iterate over implemented resources
-		NodeIterator resourceIterator = this.adapterTBox.listObjectsOfProperty(Omn_lifecycle.implements_);
+		NodeIterator resourceIterator = adapterTBox.listObjectsOfProperty(Omn_lifecycle.implements_);
 		if (resourceIterator.hasNext()) {
 			Resource resource = resourceIterator.next().asResource();
 			adapterABox.addProperty(Omn_lifecycle.canImplement, resource);
 		}
+	}
 
-		// Find properties
-		String dockerPrefix = model.getNsPrefixURI("docker");
-
-		propImage   = model.getProperty(dockerPrefix, "image");
-		propCommand = model.getProperty(dockerPrefix, "command");
-		propPortMap = model.getProperty(dockerPrefix, "portMap");
-
+	public void connect(String hostname, int port) {
 		// Instantiate docker client
-		client = new DockerClient("localhost", 1337);
+		logger.info("Docker API at " + hostname + ":" + port);
+
+		client = new DockerClient(hostname, port);
 
 		try {
 			VersionInformation verInfo = client.version();
@@ -95,7 +88,7 @@ public class DockerAdapter extends AbstractAdapter {
 		);
 		instances.put(instanceURI, container);
 
-		container.update(resourceModel);
+		container.update(resourceModel.getResource(instanceURI));
 
 		return container.serializeModel();
 	}
@@ -109,7 +102,7 @@ public class DockerAdapter extends AbstractAdapter {
 		if (container == null)
 			return ModelFactory.createDefaultModel();
 
-		container.update(resourceModel);
+		container.update(resourceModel.getResource(instanceURI));
 		return container.serializeModel();
 	}
 

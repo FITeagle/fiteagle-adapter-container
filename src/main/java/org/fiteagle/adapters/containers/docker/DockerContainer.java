@@ -5,6 +5,8 @@ import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
 import java.util.logging.Logger;
 
+import javax.ejb.EJB;
+
 import org.fiteagle.adapters.containers.docker.internal.ContainerConfiguration;
 import org.fiteagle.adapters.containers.docker.internal.DockerClient;
 import org.fiteagle.adapters.containers.docker.internal.DockerException;
@@ -21,6 +23,9 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 
 public class DockerContainer {
 	private final Logger logger = Logger.getLogger(getClass().getName());
+
+	@EJB
+	DockerAdapterControl adapterControl;
 
 	private DockerAdapter adapter;
 
@@ -49,10 +54,8 @@ public class DockerContainer {
 		instanceResource = resource;
 	}
 
-	public void update(Model updateModel) {
+	public void update(Resource newState) {
 		logger.info("Received update request");
-
-		Resource newState = updateModel.getResource(instanceIdentifier);
 
 		if (newState == null || !newState.hasProperty(Omn_lifecycle.hasState)) {
 			logger.severe("Invalid update model");
@@ -146,19 +149,19 @@ public class DockerContainer {
 		containerConf = new ContainerConfiguration(null, null);
 
 		// Image
-		if (newState.hasProperty(adapter.propImage)) {
-			Statement stmtImage = newState.getProperty(adapter.propImage);
+		if (newState.hasProperty(adapterControl.propImage)) {
+			Statement stmtImage = newState.getProperty(adapterControl.propImage);
 			containerConf.image = stmtImage.getObject().asLiteral().getString();
 		}
 
 		// Command
-		if (newState.hasProperty(adapter.propCommand)) {
-			Statement stmtImage = newState.getProperty(adapter.propCommand);
+		if (newState.hasProperty(adapterControl.propCommand)) {
+			Statement stmtImage = newState.getProperty(adapterControl.propCommand);
 			containerConf.setCommandEasily(stmtImage.getObject().asLiteral().getString());
 		}
 
 		// Port mappings
-		StmtIterator portMapIter = newState.listProperties(adapter.propPortMap);
+		StmtIterator portMapIter = newState.listProperties(adapterControl.propPortMap);
 		while (portMapIter.hasNext()) {
 			String value = portMapIter.next().getObject().asLiteral().getString();
 			String[] segments = value.split(":");

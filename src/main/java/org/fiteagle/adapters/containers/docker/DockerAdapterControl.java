@@ -1,6 +1,7 @@
 package org.fiteagle.adapters.containers.docker;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
@@ -14,14 +15,23 @@ import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.OntologyModelUtil;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 @Singleton
 @Startup
 public class DockerAdapterControl extends AdapterControl {
+	public static final String CONF_HOSTNAME = "hostname";
+	public static final String CONF_PORT = "port";
+
+	public Property propAdapterHostname, propAdapterPort, propImage, propCommand, propPortMap;
+
+	private final Logger logger = Logger.getLogger(getClass().getName());
+
 	@Inject
 	protected DockerAdapterMDBSender adapterSender;
 
@@ -32,6 +42,15 @@ public class DockerAdapterControl extends AdapterControl {
 			IMessageBus.SERIALIZATION_TURTLE
 		);
 
+		String dockerPrefix = adapterModel.getNsPrefixURI("docker");
+
+		propAdapterHostname = adapterModel.getProperty(dockerPrefix, "hostname");
+		propAdapterPort     = adapterModel.getProperty(dockerPrefix, "port");
+
+		propImage   = adapterModel.getProperty(dockerPrefix, "image");
+		propCommand = adapterModel.getProperty(dockerPrefix, "command");
+		propPortMap = adapterModel.getProperty(dockerPrefix, "portMap");
+
 		adapterInstancesConfig = readConfig("DockerAdapter");
 
 		createAdapterInstances();
@@ -41,13 +60,6 @@ public class DockerAdapterControl extends AdapterControl {
 	@Override
 	protected void addAdapterProperties(Map<String, String> arg0) {
 
-	}
-
-	@Override
-	public AbstractAdapter createAdapterInstance(Model mod, Resource res) {
-		DockerAdapter adapter = new DockerAdapter(mod, res);
-		adapterInstances.put(adapter.getId(), adapter);
-		return adapter;
 	}
 
 	@Override
@@ -74,19 +86,55 @@ public class DockerAdapterControl extends AdapterControl {
     		if (!entry.isJsonObject())
     			continue;
 
-    		JsonElement comIDElem = entry.getAsJsonObject().get(IAbstractAdapter.COMPONENT_ID);
+    		JsonObject comConf = entry.getAsJsonObject();
 
-    		if (!comIDElem.isJsonPrimitive())
+    		logger.info("Using adapter configuration: ");
+    		logger.info(comConf.toString());
+
+    		if (!comConf.has(IAbstractAdapter.COMPONENT_ID) || !comConf.has(CONF_HOSTNAME) || !comConf.has(CONF_PORT)) {
+    			logger.warning("Ignoring invalid adapter configuration");
     			continue;
+    		}
+
+    		JsonElement comIDElem = comConf.get(IAbstractAdapter.COMPONENT_ID);
+    		JsonElement comHostnameElem = comConf.get(CONF_HOSTNAME);
+    		JsonElement comPortElem = comConf.get(CONF_PORT);
+
+    		if (!comIDElem.isJsonPrimitive() || !comHostnameElem.isJsonPrimitive() || !comPortElem.isJsonPrimitive()) {
+    			logger.warning("Ignoring configuration: invalid schema");
+    			continue;
+    		}
 
     		String comID = comIDElem.getAsJsonPrimitive().getAsString();
+    		String comHostname = comHostnameElem.getAsJsonPrimitive().getAsString();
+    		int comPort = comPortElem.getAsJsonPrimitive().getAsInt();
 
-    		if (!comID.isEmpty()) {
-    			createAdapterInstance(
-					adapterModel,
-					ModelFactory.createDefaultModel().createResource(comID)
-				);
+    		if (comID.isEmpty() || comHostname.isEmpty()) {
+    			logger.warning("Ignoring configuration: empty identifier or hostname");
+    			continue;
     		}
+
+    		Resource configResource = ModelFactory.createDefaultModel().createResource(comID);
+
+    		configResource.addProperty(propAdapterHostname, comHostname);
+    		configResource.addProperty(propAdapterPort, String.valueOf(comPort));
+
+			createAdapterInstance(
+				adapterModel,
+				configResource
+			);
     	}
+	}
+
+	@Override
+	public AbstractAdapter createAdapterInstance(Model mod, Resource res) {
+		String endpointHostname = res.getProperty(propAdapterHostname).getObject().asLiteral().getString();
+		int endpointPort = res.getProperty(propAdapterPort).getObject().asLiteral().getInt();
+
+		DockerAdapter adapter = new DockerAdapter(mod, res);
+		adapter.connect(endpointHostname, endpointPort);
+
+		adapterInstances.put(adapter.getId(), adapter);
+		return adapter;
 	}
 }

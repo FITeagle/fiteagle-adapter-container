@@ -11,6 +11,20 @@ docker:Adapter
 	rdfs:subClassOf          omn:Adapter;
 	omn-lifecycle:implements docker:Container.
 
+docker:hostname
+	a           owl:DatatypeProperty;
+	a           owl:FunctionalProperty;
+	rdfs:domain docker:Adapter;
+	rdfs:label  "hostname"@en;
+	rdfs:range  xsd:string.
+
+docker:port
+	a           owl:DatatypeProperty;
+	a           owl:FunctionalProperty;
+	rdfs:domain docker:Adapter;
+	rdfs:label  "hostname"@en;
+	rdfs:range  xsd:integer.
+
 # Container
 docker:Container
 	a                           owl:Class;
