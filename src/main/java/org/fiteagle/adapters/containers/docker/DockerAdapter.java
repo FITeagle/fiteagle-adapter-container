@@ -2,6 +2,8 @@ package org.fiteagle.adapters.containers.docker;
 
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -67,9 +69,14 @@ public class DockerAdapter extends AbstractAdapter {
 		try {
 			VersionInformation verInfo = client.version();
 			logger.info(verInfo.toString());
+			adapterABox.addProperty(Omn_lifecycle.hasState, Omn_lifecycle.Ready);
 		} catch (DockerException e) {
+			adapterABox.addProperty(Omn_lifecycle.hasState, Omn_lifecycle.Failure);
 			logger.severe("Failed to get version information");
-			e.printStackTrace();
+
+			StringWriter strwr = new StringWriter();
+			e.printStackTrace(new PrintWriter(strwr));
+			logger.severe(strwr.toString());
 		}
 	}
 
