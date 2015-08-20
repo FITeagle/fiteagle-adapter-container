@@ -55,57 +55,45 @@ public class DockerContainer {
 
 		configureFromResource(newState);
 
-		if (newState == null || !newState.hasProperty(Omn_lifecycle.hasState)) {
-			logger.severe("Invalid update model");
-			return;
-		}
-
-		// Check resource state
-		Resource stateResource =
-			newState.getProperty(Omn_lifecycle.hasState).getObject().asResource();
-
-		if (stateResource.equals(Omn_lifecycle.Active)) {
-			containerState = State.Active;
-		} else if (stateResource.equals(Omn_lifecycle.Failure)) {
-			containerState = State.Failed;
-		} else {
-			containerState = State.Dead;
-		}
+//		if (newState == null || !newState.hasProperty(Omn_lifecycle.hasState)) {
+//			logger.severe("Invalid update model");
+//			return;
+//		}
+//
+//		// Check resource state
+//		Resource stateResource =
+//			newState.getProperty(Omn_lifecycle.hasState).getObject().asResource();
+//
+//		if (stateResource.equals(Omn_lifecycle.Active)) {
+//			containerState = State.Active;
+//		} else if (stateResource.equals(Omn_lifecycle.Failure)) {
+//			containerState = State.Failed;
+//		} else {
+//			containerState = State.Dead;
+//		}
 
 		handleState();
 	}
 
 	private void handleState() {
-		switch (containerState) {
-			case Dead:
-				delete();
-				break;
+		if (containerID != null) {
+			delete();
+		}
 
-			case Failed:
-				break;
+		if (containerConf == null) {
+			containerState = State.Dead;
+			return;
+		}
 
-			case Active:
-				if (containerID != null) {
-					delete();
-				}
-
-				if (containerConf == null) {
-					containerState = State.Dead;
-					break;
-				}
-
-				try {
-					containerID = adapter.getDockerClient().create(containerConf);
-					containerState =
-						adapter.getDockerClient().start(containerID)
-							? State.Active
-							: State.Failed;
-				} catch (DockerException e) {
-					logger.throwing(DockerClient.class.getName(), "create/start", e);
-					containerState = State.Failed;
-				}
-
-				break;
+		try {
+			containerID = adapter.getDockerClient().create(containerConf);
+			containerState =
+				adapter.getDockerClient().start(containerID)
+					? State.Active
+					: State.Dead;
+		} catch (DockerException e) {
+			logger.throwing(DockerClient.class.getName(), "create/start", e);
+			containerState = State.Failed;
 		}
 	}
 
