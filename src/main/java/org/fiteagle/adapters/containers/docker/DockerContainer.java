@@ -5,8 +5,6 @@ import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
 import java.util.logging.Logger;
 
-import javax.ejb.EJB;
-
 import org.fiteagle.adapters.containers.docker.internal.ContainerConfiguration;
 import org.fiteagle.adapters.containers.docker.internal.DockerClient;
 import org.fiteagle.adapters.containers.docker.internal.DockerException;
@@ -24,10 +22,8 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 public class DockerContainer {
 	private final Logger logger = Logger.getLogger(getClass().getName());
 
-	@EJB
-	DockerAdapterControl adapterControl;
-
 	private DockerAdapter adapter;
+	private DockerAdapterControl adapterControl;
 
 	private Resource instanceResource;
 	private String instanceIdentifier;
@@ -49,6 +45,7 @@ public class DockerContainer {
 		Resource resource
 	) {
 		adapter = parent;
+		adapterControl = parent.parent;
 
 		instanceIdentifier = uri;
 		instanceResource = resource;
@@ -148,6 +145,8 @@ public class DockerContainer {
 
 	private void configureFromResource(Resource newState) {
 		containerConf = new ContainerConfiguration(null, null);
+
+		logger.info("newState = " + (newState == null) + ", adapterControl = " + (adapterControl == null));
 
 		// Image
 		if (newState.hasProperty(adapterControl.propImage)) {

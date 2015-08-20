@@ -26,9 +26,13 @@ public class DockerAdapter extends AbstractAdapter {
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	private final HashMap<String, DockerContainer> instances;
 
+	public DockerAdapterControl parent;
+
 	private DockerClient client;
 
-	public DockerAdapter(Model model, Resource res) {
+	public DockerAdapter(DockerAdapterControl ctl, Model model, Resource res) {
+		parent = ctl;
+
 		instances = new HashMap<String, DockerContainer>();
 		uuid = UUID.randomUUID().toString();
 

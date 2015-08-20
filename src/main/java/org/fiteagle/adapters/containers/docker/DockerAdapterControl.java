@@ -131,7 +131,7 @@ public class DockerAdapterControl extends AdapterControl {
 		String endpointHostname = res.getProperty(propAdapterHostname).getObject().asLiteral().getString();
 		int endpointPort = res.getProperty(propAdapterPort).getObject().asLiteral().getInt();
 
-		DockerAdapter adapter = new DockerAdapter(mod, res);
+		DockerAdapter adapter = new DockerAdapter(this, mod, res);
 		adapter.connect(endpointHostname, endpointPort);
 
 		adapterInstances.put(adapter.getId(), adapter);
