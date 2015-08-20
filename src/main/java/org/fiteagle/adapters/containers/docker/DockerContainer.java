@@ -64,9 +64,9 @@ public class DockerContainer {
 			newState.getProperty(Omn_lifecycle.hasState).getObject().asResource();
 
 		if (stateResource.equals(Omn_lifecycle.Ready)) {
-			configureFromResource(newState);
+			handleReady(newState);
 		} else if (stateResource.equals(Omn_lifecycle.Uncompleted)) {
-			configureFromResource(newState);
+			handleUncompleted(newState);
 		} else {
 			logger.severe("Unsupported lifecycle state: " + stateResource.toString());
 		}
