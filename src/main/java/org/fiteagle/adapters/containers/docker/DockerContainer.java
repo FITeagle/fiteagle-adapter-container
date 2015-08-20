@@ -173,8 +173,8 @@ public class DockerContainer {
 
 			if (segments.length > 2) {
 				try {
-					int guestPort = Integer.parseInt(segments[1]);
-					int hostPort = Integer.parseInt(segments[2]);
+					int hostPort = Integer.parseInt(segments[1]);
+					int guestPort = Integer.parseInt(segments[2]);
 					containerConf.bindPort(segments[0], hostPort, guestPort);
 
 					logger.info("Bound port " + value);
