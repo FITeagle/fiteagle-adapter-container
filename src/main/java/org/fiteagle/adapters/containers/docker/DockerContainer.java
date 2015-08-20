@@ -146,8 +146,6 @@ public class DockerContainer {
 	private void configureFromResource(Resource newState) {
 		containerConf = new ContainerConfiguration(null, null);
 
-		logger.info("newState = " + (newState == null) + ", adapterControl = " + (adapterControl == null));
-
 		// Image
 		if (newState.hasProperty(adapterControl.propImage)) {
 			Statement stmtImage = newState.getProperty(adapterControl.propImage);
