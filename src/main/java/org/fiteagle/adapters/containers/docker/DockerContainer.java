@@ -66,12 +66,13 @@ public class DockerContainer {
 		Resource stateResource =
 			newState.getProperty(Omn_lifecycle.hasState).getObject().asResource();
 
-		if (stateResource.equals(Omn_lifecycle.Ready))
-			handleReady(newState);
-		else if (stateResource.equals(Omn_lifecycle.Uncompleted))
-			handleUncompleted(newState);
-		else
+		if (stateResource.equals(Omn_lifecycle.Ready)) {
+			configureFromResource(newState);
+		} else if (stateResource.equals(Omn_lifecycle.Uncompleted)) {
+			configureFromResource(newState);
+		} else {
 			logger.severe("Unsupported lifecycle state: " + stateResource.toString());
+		}
 	}
 
 	private void handleUncompleted(Resource newState) {
@@ -152,12 +153,17 @@ public class DockerContainer {
 		if (newState.hasProperty(adapterControl.propImage)) {
 			Statement stmtImage = newState.getProperty(adapterControl.propImage);
 			containerConf.image = stmtImage.getObject().asLiteral().getString();
+
+			logger.info("Image = " + containerConf.image);
 		}
 
 		// Command
 		if (newState.hasProperty(adapterControl.propCommand)) {
 			Statement stmtImage = newState.getProperty(adapterControl.propCommand);
-			containerConf.setCommandEasily(stmtImage.getObject().asLiteral().getString());
+			String command = stmtImage.getObject().asLiteral().getString();
+
+			logger.info("Command = " + command);
+			containerConf.setCommandEasily(command);
 		}
 
 		// Port mappings
@@ -168,7 +174,11 @@ public class DockerContainer {
 
 			if (segments.length > 2) {
 				try {
-					containerConf.bindPort(segments[0], Integer.parseInt(segments[2]), Integer.parseInt(segments[1]));
+					int guestPort = Integer.parseInt(segments[1]);
+					int hostPort = Integer.parseInt(segments[2]);
+					containerConf.bindPort(segments[0], hostPort, guestPort);
+
+					logger.info("Bound port " + value);
 				} catch (NumberFormatException e) {
 					logger.warning("Ignoring port map '" + value + "'");
 				}
@@ -195,23 +205,25 @@ public class DockerContainer {
     	);
         property.addProperty(RDF.type, OWL.FunctionalProperty);
 
-        switch (containerState) {
-	        case Dead:
-	    		resource.addProperty(property, Omn_lifecycle.NotReady);
-	    		break;
+//        switch (containerState) {
+//	        case Dead:
+//	    		resource.addProperty(property, Omn_lifecycle.NotReady);
+//	    		break;
+//
+//	        case Failed:
+//	    		resource.addProperty(property, Omn_lifecycle.Failure);
+//	    		break;
+//
+//	        case Configured:
+//	    		resource.addProperty(property, Omn_lifecycle.Provisioned);
+//	    		break;
+//
+//	        case Active:
+//	        	resource.addProperty(property, Omn_lifecycle.Active);
+//	        	break;
+//        }
 
-	        case Failed:
-	    		resource.addProperty(property, Omn_lifecycle.Failure);
-	    		break;
-
-	        case Configured:
-	    		resource.addProperty(property, Omn_lifecycle.Provisioned);
-	    		break;
-
-	        case Active:
-	        	resource.addProperty(property, Omn_lifecycle.Active);
-	        	break;
-        }
+        resource.addProperty(property, Omn_lifecycle.Ready);
 
         // TODO: Serialize properties
 
