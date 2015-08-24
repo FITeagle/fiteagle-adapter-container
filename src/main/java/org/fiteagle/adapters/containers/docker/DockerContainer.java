@@ -89,6 +89,8 @@ public class DockerContainer {
 			logger.info("Creating container with configuration: "
 			            + containerConf.toJsonObject().toString());
 
+			// TODO: Check if requested container image is available on the host
+
 			containerID = adapter.getDockerClient().create(containerConf);
 			containerState =
 				adapter.getDockerClient().start(containerID)
