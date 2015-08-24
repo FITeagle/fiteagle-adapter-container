@@ -86,6 +86,9 @@ public class DockerContainer {
 		}
 
 		try {
+			logger.info("Creating container with configuration: "
+			            + containerConf.toJsonObject().toString());
+
 			containerID = adapter.getDockerClient().create(containerConf);
 			containerState =
 				adapter.getDockerClient().start(containerID)
