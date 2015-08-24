@@ -86,44 +86,56 @@ public class DockerAdapterControl extends AdapterControl {
     		if (!entry.isJsonObject())
     			continue;
 
-    		JsonObject comConf = entry.getAsJsonObject();
-
-    		logger.info("Using adapter configuration: ");
-    		logger.info(comConf.toString());
-
-    		if (!comConf.has(IAbstractAdapter.COMPONENT_ID) || !comConf.has(CONF_HOSTNAME) || !comConf.has(CONF_PORT)) {
-    			logger.warning("Ignoring invalid adapter configuration");
-    			continue;
-    		}
-
-    		JsonElement comIDElem = comConf.get(IAbstractAdapter.COMPONENT_ID);
-    		JsonElement comHostnameElem = comConf.get(CONF_HOSTNAME);
-    		JsonElement comPortElem = comConf.get(CONF_PORT);
-
-    		if (!comIDElem.isJsonPrimitive() || !comHostnameElem.isJsonPrimitive() || !comPortElem.isJsonPrimitive()) {
-    			logger.warning("Ignoring configuration: invalid schema");
-    			continue;
-    		}
-
-    		String comID = comIDElem.getAsJsonPrimitive().getAsString();
-    		String comHostname = comHostnameElem.getAsJsonPrimitive().getAsString();
-    		int comPort = comPortElem.getAsJsonPrimitive().getAsInt();
-
-    		if (comID.isEmpty() || comHostname.isEmpty()) {
-    			logger.warning("Ignoring configuration: empty identifier or hostname");
-    			continue;
-    		}
-
-    		Resource configResource = ModelFactory.createDefaultModel().createResource(comID);
-
-    		configResource.addProperty(propAdapterHostname, comHostname);
-    		configResource.addProperty(propAdapterPort, String.valueOf(comPort));
-
-			createAdapterInstance(
-				adapterModel,
-				configResource
-			);
+    		try {
+				createAdapterFromConf(entry.getAsJsonObject());
+			} catch (DockerControlException e) {
+				// No need to log exception, 'createAdapterFromConf' already does that
+			}
     	}
+	}
+
+	public AbstractAdapter createAdapterFromConf(JsonObject comConf) throws DockerControlException {
+		logger.info("Using adapter configuration: ");
+		logger.info(comConf.toString());
+
+		if (!comConf.has(IAbstractAdapter.COMPONENT_ID) || !comConf.has(CONF_HOSTNAME) || !comConf.has(CONF_PORT)) {
+			logger.warning("Ignoring invalid adapter configuration");
+			throw new DockerControlException("Ignoring invalid adapter configuration");
+		}
+
+		JsonElement comIDElem = comConf.get(IAbstractAdapter.COMPONENT_ID);
+		JsonElement comHostnameElem = comConf.get(CONF_HOSTNAME);
+		JsonElement comPortElem = comConf.get(CONF_PORT);
+
+		if (!comIDElem.isJsonPrimitive() || !comHostnameElem.isJsonPrimitive() || !comPortElem.isJsonPrimitive()) {
+			logger.warning("Ignoring configuration: invalid schema");
+			throw new DockerControlException("Ignoring configuration: invalid schema");
+		}
+
+		String comID = comIDElem.getAsJsonPrimitive().getAsString();
+		String comHostname = comHostnameElem.getAsJsonPrimitive().getAsString();
+		int comPort = comPortElem.getAsJsonPrimitive().getAsInt();
+
+		return createAdapterInstance(comID, comHostname, comPort);
+	}
+
+	public AbstractAdapter createAdapterInstance(String comID, String comHostname, int comPort)
+		throws DockerControlException
+	{
+		if (comID.isEmpty() || comHostname.isEmpty()) {
+			logger.warning("Ignoring configuration: empty identifier or hostname");
+			throw new DockerControlException("Ignoring configuration: empty identifier or hostname");
+		}
+
+		Resource configResource = ModelFactory.createDefaultModel().createResource(comID);
+
+		configResource.addProperty(propAdapterHostname, comHostname);
+		configResource.addProperty(propAdapterPort, String.valueOf(comPort));
+
+		return createAdapterInstance(
+			adapterModel,
+			configResource
+		);
 	}
 
 	@Override
