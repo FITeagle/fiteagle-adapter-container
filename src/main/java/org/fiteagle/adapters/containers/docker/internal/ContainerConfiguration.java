@@ -161,7 +161,7 @@ public class ContainerConfiguration {
 	 * Map guest port to a port on the host side.
 	 */
 	public void bindPort(String protocol, int hostPort, int guestPort) {
-		String bindKey = protocol + "/" + String.valueOf(guestPort);
+		String bindKey = String.valueOf(guestPort) + "/" + protocol;
 
 		JsonObject hostBinding = new JsonObject();
 		hostBinding.add("HostPort", new JsonPrimitive(String.valueOf(hostPort)));
