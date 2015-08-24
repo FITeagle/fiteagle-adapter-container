@@ -22,7 +22,7 @@
 		<docker:image
 			rdf:datatype="http://www.w3.org/2001/XMLSchema#string">ubuntu:latest</docker:image>
 		<docker:command
-			rdf:datatype="http://www.w3.org/2001/XMLSchema#string">/bin/bash</docker:command>
+			rdf:datatype="http://www.w3.org/2001/XMLSchema#string">/bin/true</docker:command>
 		<docker:portMap
 			rdf:datatype="http://www.w3.org/2001/XMLSchema#string">tcp:10022:22</docker:portMap>
 	</docker:Container>
