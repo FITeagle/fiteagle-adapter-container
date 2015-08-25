@@ -7,11 +7,7 @@
 @prefix docker:        <http://docker.com/schema/docker#>.
 
 <http://localhost/resource/docker/example-1>
-    a                           docker:Container;
-    omn-lifecycle:implementedBy <http://localhost/resource/DockerAdapter-1>;
-    docker:image                "ubuntu:latest"^^xsd:string;
-    docker:command              (
+    docker:command (
         "/bin/echo"
         "Hello World"
-    );
-    docker:portMap              "tcp:10022:22"^^xsd:string.
+    ).

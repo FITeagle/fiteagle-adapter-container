@@ -1,21 +1,17 @@
 package org.fiteagle.adapters.containers.docker;
 
+import com.hp.hpl.jena.rdf.model.*;
 import info.openmultinet.ontology.vocabulary.Omn;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.fiteagle.adapters.containers.docker.internal.ContainerConfiguration;
 import org.fiteagle.adapters.containers.docker.internal.DockerClient;
 import org.fiteagle.adapters.containers.docker.internal.DockerException;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
@@ -25,7 +21,7 @@ public class DockerContainer {
 	private DockerAdapter adapter;
 	private DockerAdapterControl adapterControl;
 
-	private Resource instanceResource;
+	private Resource adapterResource;
 	private String instanceIdentifier;
 
 	private enum State {
@@ -47,7 +43,7 @@ public class DockerContainer {
 		adapterControl = parent.parent;
 
 		instanceIdentifier = uri;
-		instanceResource = resource;
+		adapterResource = resource;
 	}
 
 	public void update(Resource newState) {
@@ -97,6 +93,37 @@ public class DockerContainer {
 		containerState = State.Dead;
 	}
 
+	private static void extractStringList(List<String> output, Resource head) {
+		if (head == null)
+			return;
+
+		if (head.hasProperty(RDF.first))
+			output.add(head.getProperty(RDF.first).getObject().asLiteral().getString());
+
+		if (head.hasProperty(RDF.rest))
+			extractStringList(output, head.getProperty(RDF.rest).getObject().asResource());
+	}
+
+	private static Resource makeStringList(Model model, int i, String[] list) {
+		if (i == list.length - 1) {
+			Resource res = model.createResource(AnonId.create());
+
+			res.addProperty(RDF.first, list[i]);
+			res.addProperty(RDF.rest, RDF.nil);
+
+			return res;
+		} else if (i >= list.length) {
+			return null;
+		} else {
+			Resource res = model.createResource(AnonId.create());
+
+			res.addProperty(RDF.first, list[i]);
+			res.addProperty(RDF.rest, makeStringList(model, i + 1, list));
+
+			return res;
+		}
+	}
+
 	private void configureFromResource(Resource newState) {
 		containerConf = new ContainerConfiguration(null, null);
 
@@ -110,11 +137,20 @@ public class DockerContainer {
 
 		// Command
 		if (newState.hasProperty(adapterControl.propCommand)) {
-			Statement stmtImage = newState.getProperty(adapterControl.propCommand);
-			String command = stmtImage.getObject().asLiteral().getString();
+			Statement stmtCommand = newState.getProperty(adapterControl.propCommand);
+			RDFNode commandHead = stmtCommand.getObject();
 
-			logger.info("Command = " + command);
-			containerConf.setCommandEasily(command);
+			if (commandHead.isResource()) {
+				LinkedList<String> listOut = new LinkedList<>();
+				extractStringList(listOut, commandHead.asResource());
+
+				String[] commands = new String[listOut.size()];
+				listOut.toArray(commands);
+
+				containerConf.setCommand(commands);
+			} else if (commandHead.isLiteral()) {
+				containerConf.setCommandEasily(commandHead.asLiteral().getString());
+			}
 		}
 
 		// Port mappings
@@ -143,9 +179,10 @@ public class DockerContainer {
 		Model responseModel = ModelFactory.createDefaultModel();
 		Resource resource = responseModel.createResource(instanceIdentifier);
 
-		resource.addProperty(RDF.type, instanceResource);
+		resource.addProperty(RDF.type, adapterResource);
 		resource.addProperty(RDF.type, Omn.Resource);
 		resource.addProperty(RDFS.label, resource.getLocalName());
+		resource.addProperty(Omn_lifecycle.implementedBy, adapterResource);
 
 		switch (containerState) {
 			case Dead:
@@ -160,6 +197,15 @@ public class DockerContainer {
 			case Active:
 				resource.addProperty(Omn_lifecycle.hasState, Omn_lifecycle.Active);
 				break;
+		}
+
+		if (containerConf != null) {
+			if (containerConf.image != null)
+				resource.addProperty(adapterControl.propImage, containerConf.image);
+
+			String[] commands = containerConf.getCommand();
+			if (commands != null && commands.length > 0)
+				resource.addProperty(adapterControl.propCommand, makeStringList(responseModel, 0, commands));
 		}
 
 		return responseModel;
