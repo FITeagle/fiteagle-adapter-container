@@ -55,27 +55,37 @@
 	   	}
 	}
 
+	function deleten(){
+
+		var uri = document.getElementById("containerId").value;
+
+		httpGetAsync("http://localhost:8080/containers/docker/delete?uri=" + uri);
+	}
+
 	//localhost:8080/containers/docker/adapters
 
 	</script>
 </head>
 <body>
-	<br>
-		<input id="fileInput" type="file" value="getFile" onchange="loadFile()">
-		<input id="chosenLang" type="radio" name="chosenLang" value="TURTLE" checked>TURTLE
-		<input id="chosenLang" type="radio" name="chosenLang" value="RDF/XML">RDF/XML
-		<input id="chosenLang" type="radio" name="chosenLang" value="N-TRIPLE">N-TRIPLE
-		<input id="chosenLang" type="radio" name="chosenLang" value="RDF/JSON">RDF/JSON
-		<input id="chosenLang" type="radio" name="chosenLang" value="JSON-LD">JSON-LD
-		<input id="chosenLang" type="radio" name="chosenLang" value="HDT">HDT
-		<br>
+	<br />
+		<input id="fileInput" type="file" value="getFile" onchange="loadFile()" />
+		<input id="chosenLang" type="radio" name="chosenLang" value="TURTLE" checked />TURTLE
+		<input id="chosenLang" type="radio" name="chosenLang" value="RDF/XML" />RDF/XML
+		<input id="chosenLang" type="radio" name="chosenLang" value="N-TRIPLE" />N-TRIPLE
+		<input id="chosenLang" type="radio" name="chosenLang" value="RDF/JSON" />RDF/JSON
+		<input id="chosenLang" type="radio" name="chosenLang" value="JSON-LD" />JSON-LD
+		<input id="chosenLang" type="radio" name="chosenLang" value="HDT" />HDT
+		<br />
 
 
 		<textarea id="fileContents" cols="100" rows="10" form="submitXML"></textarea>
-		<br>
-		<input type="button" id="submitTextArea" form="submitXML" onclick="httpPostAsync('http://localhost:8080/containers/docker/create')" value="create">
-		<input type="button" id="submitTextArea" form="submitXML" onclick="httpPostAsync('http://localhost:8080/containers/docker/update')" value="update">
-	<br>
-	<br>
+		<br />
+		<input type="button" id="submitTextArea" form="submitXML" onclick="httpPostAsync('http://localhost:8080/containers/docker/create')" value="create" />
+		<input type="button" id="submitTextArea" form="submitXML" onclick="httpPostAsync('http://localhost:8080/containers/docker/update')" value="update" />
+		<br />
+		<input type="text" id="containerId" value="enter URI to delete" />
+		<input type="button" onclick="deleten()" value="deleten" />
+	<br />
+	<br />
 <body>
 </html>
