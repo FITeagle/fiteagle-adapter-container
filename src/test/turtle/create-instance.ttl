@@ -1,0 +1,13 @@
+@prefix rdfs:          <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix owl:           <http://www.w3.org/2002/07/owl#>.
+@prefix xsd:           <http://www.w3.org/2001/XMLSchema#>.
+@prefix omn:           <http://open-multinet.info/ontology/omn#>.
+@prefix omn-lifecycle: <http://open-multinet.info/ontology/omn-lifecycle#>.
+@prefix docker:        <http://docker.com/schema/docker#>.
+
+<http://localhost/resource/docker/example-1>
+    a                           docker:Container;
+    omn-lifecycle:implementedBy <http://localhost/resource/DockerAdapter-1>;
+    docker:image                "ubuntu:latest"^^xsd:string;
+    docker:command              "/bin/true"^^xsd:string;
+    docker:portMap              "tcp:10022:22"^^xsd:string.

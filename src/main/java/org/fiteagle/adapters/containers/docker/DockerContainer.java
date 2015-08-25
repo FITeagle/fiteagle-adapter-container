@@ -166,25 +166,18 @@ public class DockerContainer {
 		resource.addProperty(RDF.type, Omn.Resource);
 		resource.addProperty(RDFS.label, resource.getLocalName());
 
-		// Add Omn-related property
-		Property property = resource.getModel().createProperty(
-			Omn_lifecycle.hasState.getNameSpace(),
-			Omn_lifecycle.hasState.getLocalName()
-		);
-		property.addProperty(RDF.type, OWL.FunctionalProperty);
-
 		switch (containerState) {
 			case Dead:
-				resource.addProperty(property, Omn_lifecycle.Uncompleted);
+				resource.addProperty(Omn_lifecycle.hasState, Omn_lifecycle.Uncompleted);
 				break;
 
 			case Failed:
 				// TODO: Attach error message
-				resource.addProperty(property, Omn_lifecycle.Failure);
+				resource.addProperty(Omn_lifecycle.hasState, Omn_lifecycle.Failure);
 				break;
 
 			case Active:
-				resource.addProperty(property, Omn_lifecycle.Active);
+				resource.addProperty(Omn_lifecycle.hasState, Omn_lifecycle.Active);
 				break;
 		}
 
