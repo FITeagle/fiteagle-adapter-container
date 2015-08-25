@@ -102,17 +102,14 @@ public class DockerApplication extends Application {
 
 		@GET
 		@Path("/delete")
-		public Response deleteInstance(@QueryParam("adapter") String adapterUri,
-		                               @QueryParam("resource") String resourceUri,
+		public Response deleteInstance(@QueryParam("uri") String uri,
 		                               @Context HttpServletRequest req)
 			throws IOException, AbstractAdapter.ProcessingException, InstanceNotFoundException, InvalidRequestException
 		{
-			AbstractAdapter adapter = findAdapterByURI(adapterUri);
+			for (AbstractAdapter aa: adapterControl.getAdapterInstances()) {
+				aa.deleteInstance(uri);
+			}
 
-			if (adapter == null)
-				return Response.status(404).build();
-
-			adapter.deleteInstance(resourceUri);
 			return Response.ok().status(200).build();
 		}
 	}
