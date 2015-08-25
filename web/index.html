@@ -1,0 +1,81 @@
+		<input type="button" name="someButton" value="hello" onclick="httpGetAsync('http://localhost:8080/containers/docker/')">
+<!DOCTYPE html>
+<link rel="stylesheet" type="text/css" href="index.css">
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>
+		some interface
+	</title>
+	<script type="text/javascript">
+	function httpGetAsync(theUrl){
+	    var xmlHttp = new XMLHttpRequest();
+	    if(xmlHttp){
+		    xmlHttp.open("GET", theUrl, true); // true for asynchronous 
+		    xmlHttp.onreadystatechange = function() { 
+		        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+		            document.getElementById("fileContents").value = xmlHttp.responseText();
+	    	}
+	    }else{
+	    	alert("shit went wrong");
+	    }
+	    xmlHttp.send(null);
+	}
+
+	function httpPostAsync(theUrl){
+		var xmlHttp = new XMLHttpRequest();
+		var params = "?lang=" + document.getElementById("chosenLang").value;
+	    if(xmlHttp){
+		    xmlHttp.open("POST", theUrl+params, true); // true for asynchronous 
+		    xmlHttp.onreadystatechange = function() { 
+
+		    	console.log(xmlHttp.status, xmlHttp.responseText);
+		        if (xmlHttp.readyState == 4 && xmlHttp.status == 201)
+		            document.getElementById("fileContents").value = xmlHttp.responseText();
+	    	}
+	    }else{
+	    	alert("shit went wrong");
+	    }
+	    xmlHttp.send(document.getElementById("fileContents").value);
+	}
+
+	function loadFile(){
+		var control = document.getElementById("fileInput");
+		var file = control.files[0];
+
+	    if (file) {
+	      var reader = new FileReader();
+	      reader.onload = function(e) { 
+		      var contents = e.target.result;
+		      document.getElementById("fileContents").value = contents;
+	      }
+	      reader.readAsText(file);
+	    } else { 
+	      alert("Failed to load file");
+	   	}
+	}
+
+	//localhost:8080/containers/docker/adapters
+
+	</script>
+</head>
+<body>
+	<br>
+		<input id="fileInput" type="file" value="getFile" onchange="loadFile()">
+		<input id="chosenLang" type="radio" name="chosenLang" value="TURTLE" checked>TURTLE
+		<input id="chosenLang" type="radio" name="chosenLang" value="RDF/XML">RDF/XML
+		<input id="chosenLang" type="radio" name="chosenLang" value="N-TRIPLE">N-TRIPLE
+		<input id="chosenLang" type="radio" name="chosenLang" value="RDF/JSON">RDF/JSON
+		<input id="chosenLang" type="radio" name="chosenLang" value="JSON-LD">JSON-LD
+		<input id="chosenLang" type="radio" name="chosenLang" value="HDT">HDT
+		<br>
+
+
+		<textarea id="fileContents" cols="100" rows="10" form="submitXML"></textarea>
+		<br>
+		<input type="button" id="submitTextArea" form="submitXML" onclick="httpPostAsync('http://localhost:8080/containers/docker/create')" value="create">
+		<input type="button" id="submitTextArea" form="submitXML" onclick="httpPostAsync('http://localhost:8080/containers/docker/update')" value="update">
+	<br>
+	<br>
+<body>
+</html>

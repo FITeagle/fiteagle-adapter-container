@@ -1,0 +1,23 @@
+table {
+	padding: 10px;
+	text-align: center;
+}
+
+table, th, td {
+	border: 0px solid black;
+	width: 100%;
+}
+
+#maintab {
+	text-align: center;
+	height: 100%;
+	width: 100%;
+}
+
+#startAdap {
+
+}
+
+#head {
+	width: 100%;
+}
