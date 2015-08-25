@@ -28,7 +28,7 @@ public class DockerAdapterControl extends AdapterControl {
 	public static final String CONF_HOSTNAME = "hostname";
 	public static final String CONF_PORT = "port";
 
-	public Property propAdapterHostname, propAdapterPort, propImage, propCommand, propPortMap;
+	public Property propAdapterHostname, propAdapterPort, propID, propImage, propCommand, propPortMap;
 
 	private final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -47,6 +47,7 @@ public class DockerAdapterControl extends AdapterControl {
 		propAdapterHostname = adapterModel.getProperty(dockerPrefix, "hostname");
 		propAdapterPort     = adapterModel.getProperty(dockerPrefix, "port");
 
+		propID      = adapterModel.getProperty(dockerPrefix, "id");
 		propImage   = adapterModel.getProperty(dockerPrefix, "image");
 		propCommand = adapterModel.getProperty(dockerPrefix, "command");
 		propPortMap = adapterModel.getProperty(dockerPrefix, "portMap");

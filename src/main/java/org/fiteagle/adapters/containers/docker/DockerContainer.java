@@ -198,6 +198,9 @@ public class DockerContainer {
 				break;
 		}
 
+		if (containerID != null)
+			resource.addProperty(adapterControl.propID, containerID);
+
 		if (containerConf != null) {
 			if (containerConf.image != null)
 				resource.addProperty(adapterControl.propImage, containerConf.image);
