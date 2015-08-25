@@ -12,10 +12,6 @@
 	    var xmlHttp = new XMLHttpRequest();
 	    if(xmlHttp){
 		    xmlHttp.open("GET", theUrl, true); // true for asynchronous 
-		    xmlHttp.onreadystatechange = function() { 
-		        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-		            document.getElementById("fileContents").value = xmlHttp.responseText;
-	    	}
 	    }else{
 	    	alert("shit went wrong");
 	    }
@@ -27,9 +23,7 @@
 		var params = "?lang=" + document.getElementById("chosenLang").value;
 	    if(xmlHttp){
 		    xmlHttp.open("POST", theUrl+params, true); // true for asynchronous 
-		    xmlHttp.onreadystatechange = function() { 
-
-		    	console.log(xmlHttp.status, xmlHttp.responseText);
+		    xmlHttp.onreadystatechange = function() {
 		        if (xmlHttp.readyState == 4 && xmlHttp.status == 201)
 		            document.getElementById("fileContents").value = xmlHttp.responseText;
 	    	}
