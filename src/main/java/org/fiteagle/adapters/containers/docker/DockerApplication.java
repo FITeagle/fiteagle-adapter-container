@@ -100,29 +100,20 @@ public class DockerApplication extends Application {
 			return Response.ok(modelOutput.toString()).status(201).build();
 		}
 
-		@POST
+		@GET
 		@Path("/delete")
-		public Response deleteInstance(@QueryParam("lang") String lang, @Context HttpServletRequest req)
+		public Response deleteInstance(@QueryParam("adapter") String adapterUri,
+		                               @QueryParam("resource") String resourceUri,
+		                               @Context HttpServletRequest req)
 			throws IOException, AbstractAdapter.ProcessingException, InstanceNotFoundException, InvalidRequestException
 		{
-			Model requestModel = ModelFactory.createDefaultModel();
-			requestModel.read(req.getReader(), null, lang.toUpperCase());
+			AbstractAdapter adapter = findAdapterByURI(adapterUri);
 
-			ResIterator resources = requestModel.listResourcesWithProperty(Omn_lifecycle.implementedBy);
-			while (resources.hasNext()) {
-				Resource res = resources.next();
+			if (adapter == null)
+				return Response.status(404).build();
 
-				RDFNode implementedBy = res.getProperty(Omn_lifecycle.implementedBy).getObject();
-				String adapterUri = implementedBy.asResource().getURI();
-				AbstractAdapter adapter = findAdapterByURI(adapterUri);
-
-				if (adapter == null)
-					continue;
-
-				adapter.deleteInstance(res.getURI());
-			}
-
-			return Response.ok().status(204).build();
+			adapter.deleteInstance(resourceUri);
+			return Response.ok().status(200).build();
 		}
 	}
 
