@@ -66,7 +66,7 @@ public class DockerApplication extends Application {
 			StringWriter modelOutput = new StringWriter();
 			responseModel.write(modelOutput, lang.toUpperCase(), null);
 
-			return Response.ok(modelOutput.toString()).status(201).build();
+			return Response.ok(modelOutput.toString()).status(201).header("Access-Control-Allow-Origin", "*").build();
 		}
 
 		@POST
@@ -97,7 +97,7 @@ public class DockerApplication extends Application {
 			StringWriter modelOutput = new StringWriter();
 			responseModel.write(modelOutput, lang.toUpperCase(), null);
 
-			return Response.ok(modelOutput.toString()).status(201).build();
+			return Response.ok(modelOutput.toString()).status(201).header("Access-Control-Allow-Origin", "*").build();
 		}
 
 		@GET
@@ -110,7 +110,7 @@ public class DockerApplication extends Application {
 				aa.deleteInstance(uri);
 			}
 
-			return Response.ok().status(200).build();
+			return Response.ok().status(200).header("Access-Control-Allow-Origin", "*").build();
 		}
 	}
 

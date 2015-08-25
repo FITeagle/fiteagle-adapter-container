@@ -14,7 +14,7 @@
 		    xmlHttp.open("GET", theUrl, true); // true for asynchronous 
 		    xmlHttp.onreadystatechange = function() { 
 		        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-		            document.getElementById("fileContents").value = xmlHttp.responseText();
+		            document.getElementById("fileContents").value = xmlHttp.responseText;
 	    	}
 	    }else{
 	    	alert("shit went wrong");
@@ -31,7 +31,7 @@
 
 		    	console.log(xmlHttp.status, xmlHttp.responseText);
 		        if (xmlHttp.readyState == 4 && xmlHttp.status == 201)
-		            document.getElementById("fileContents").value = xmlHttp.responseText();
+		            document.getElementById("fileContents").value = xmlHttp.responseText;
 	    	}
 	    }else{
 	    	alert("shit went wrong");
