@@ -52,26 +52,7 @@ public class DockerContainer {
 
 	public void update(Resource newState) {
 		logger.info("Received update request");
-
 		configureFromResource(newState);
-
-//		if (newState == null || !newState.hasProperty(Omn_lifecycle.hasState)) {
-//			logger.severe("Invalid update model");
-//			return;
-//		}
-//
-//		// Check resource state
-//		Resource stateResource =
-//			newState.getProperty(Omn_lifecycle.hasState).getObject().asResource();
-//
-//		if (stateResource.equals(Omn_lifecycle.Active)) {
-//			containerState = State.Active;
-//		} else if (stateResource.equals(Omn_lifecycle.Failure)) {
-//			containerState = State.Failed;
-//		} else {
-//			containerState = State.Dead;
-//		}
-
 		handleState();
 	}
 
