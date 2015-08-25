@@ -74,7 +74,7 @@ public class DockerContainer {
 					? State.Active
 					: State.Dead;
 		} catch (DockerException e) {
-			logger.throwing(DockerClient.class.getName(), "create/start", e);
+			logger.severe(e.toString());
 			containerState = State.Failed;
 		}
 	}
@@ -89,7 +89,6 @@ public class DockerContainer {
 		}
 
 		containerID = null;
-		containerConf = null;
 		containerState = State.Dead;
 	}
 
