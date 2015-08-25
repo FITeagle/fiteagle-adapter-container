@@ -181,7 +181,7 @@ public class DockerContainer {
 		resource.addProperty(RDF.type, adapterResource);
 		resource.addProperty(RDF.type, Omn.Resource);
 		resource.addProperty(RDFS.label, resource.getLocalName());
-		resource.addProperty(Omn_lifecycle.implementedBy, adapterResource);
+		resource.addProperty(Omn_lifecycle.implementedBy, adapter.getAdapterABox());
 
 		switch (containerState) {
 			case Dead:
