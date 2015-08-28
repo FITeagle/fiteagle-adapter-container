@@ -2,6 +2,9 @@ package org.fiteagle.adapters.containers.docker.internal;
 
 import com.google.gson.JsonObject;
 
+/**
+ * Packs the version information retrieve from the Docker API.
+ */
 public class VersionInformation {
 	private String operatingSystem;
 	private String version;
@@ -13,14 +16,23 @@ public class VersionInformation {
 		apiVersion = apiver;
 	}
 
+	/**
+	 * On which operating system is Docker running?
+	 */
 	public String getOperatingSystem() {
 		return operatingSystem;
 	}
 
+	/**
+	 * Get the Docker version.
+	 */
 	public String getVersion() {
 		return version;
 	}
 
+	/**
+	 * Get the Docker API Version.
+	 */
 	public String getAPIVersion() {
 		return apiVersion;
 	}
@@ -37,6 +49,11 @@ public class VersionInformation {
 				+ "}";
 	}
 
+	/**
+	 * Parse a JSON object containing version information.
+	 * @param asJsonObject
+	 * @return
+	 */
 	public static VersionInformation fromJSON(JsonObject asJsonObject) {
 		return new VersionInformation(
 			JSONHelper.getStringProperty(asJsonObject, "Os", null),

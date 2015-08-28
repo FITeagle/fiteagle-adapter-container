@@ -59,56 +59,66 @@ public class DockerAdapterControl extends AdapterControl {
 	}
 
 	@Override
-	protected void addAdapterProperties(Map<String, String> arg0) {
-
-	}
+	protected void addAdapterProperties(Map<String, String> arg0) {}
 
 	@Override
 	protected void parseConfig() {
-        String jsonProperties = adapterInstancesConfig.readJsonProperties();
+		String jsonProperties = adapterInstancesConfig.readJsonProperties();
 
-        if (jsonProperties.isEmpty())
-        	return;
+		if (jsonProperties.isEmpty())
+			return;
 
-        // Retrieve root object
-    	JsonElement parsedElem = new JsonParser().parse(jsonProperties);
+		// Retrieve root object
+		JsonElement parsedElem = new JsonParser().parse(jsonProperties);
 
-    	if (!parsedElem.isJsonObject())
-    		return;
+		if (!parsedElem.isJsonObject())
+			return;
 
-    	// Retrieve list of adapter instances
-    	JsonElement instanceListElem = parsedElem.getAsJsonObject().get(IAbstractAdapter.ADAPTER_INSTANCES);
+		// Retrieve list of adapter instances
+		JsonElement instanceListElem =
+		parsedElem.getAsJsonObject().get(IAbstractAdapter.ADAPTER_INSTANCES);
 
-    	if (instanceListElem == null || !instanceListElem.isJsonArray())
-    		return;
+		if (instanceListElem == null || !instanceListElem.isJsonArray())
+			return;
 
-    	// Iterate over list and create all instances
-    	for (JsonElement entry: instanceListElem.getAsJsonArray()) {
-    		if (!entry.isJsonObject())
-    			continue;
+		// Iterate over list and create all instances
+		for (JsonElement entry: instanceListElem.getAsJsonArray()) {
+			if (!entry.isJsonObject())
+				continue;
 
-    		try {
+			try {
 				createAdapterFromConf(entry.getAsJsonObject());
 			} catch (DockerControlException e) {
 				// No need to log exception, 'createAdapterFromConf' already does that
 			}
-    	}
+		}
 	}
 
+	/**
+	 * Create an adapter instance using a JSON configuration.
+	 * @param comConf Configuration object
+	 * @throws DockerControlException
+	 */
 	public AbstractAdapter createAdapterFromConf(JsonObject comConf) throws DockerControlException {
 		logger.info("Using adapter configuration: ");
 		logger.info(comConf.toString());
 
+		// Validate configuration schema
 		if (!comConf.has(IAbstractAdapter.COMPONENT_ID) || !comConf.has(CONF_HOSTNAME) || !comConf.has(CONF_PORT)) {
 			logger.warning("Ignoring invalid adapter configuration");
 			throw new DockerControlException("Ignoring invalid adapter configuration");
 		}
 
+		// Retrieve configuration elements
 		JsonElement comIDElem = comConf.get(IAbstractAdapter.COMPONENT_ID);
 		JsonElement comHostnameElem = comConf.get(CONF_HOSTNAME);
 		JsonElement comPortElem = comConf.get(CONF_PORT);
 
-		if (!comIDElem.isJsonPrimitive() || !comHostnameElem.isJsonPrimitive() || !comPortElem.isJsonPrimitive()) {
+		// Validate element types
+		if (!comIDElem.isJsonPrimitive() ||
+		    !comHostnameElem.isJsonPrimitive() ||
+		    !comPortElem.isJsonPrimitive())
+		{
 			logger.warning("Ignoring configuration: invalid schema");
 			throw new DockerControlException("Ignoring configuration: invalid schema");
 		}
@@ -120,6 +130,13 @@ public class DockerAdapterControl extends AdapterControl {
 		return createAdapterInstance(comID, comHostname, comPort);
 	}
 
+	/**
+	 * Create a new adapter instance
+	 * @param comID Resource identifier
+	 * @param comHostname Docker API endpoint hostname
+	 * @param comPort Docker API endpoint port
+	 * @throws DockerControlException
+	 */
 	public AbstractAdapter createAdapterInstance(String comID, String comHostname, int comPort)
 		throws DockerControlException
 	{
@@ -141,7 +158,8 @@ public class DockerAdapterControl extends AdapterControl {
 
 	@Override
 	public AbstractAdapter createAdapterInstance(Model mod, Resource res) {
-		String endpointHostname = res.getProperty(propAdapterHostname).getObject().asLiteral().getString();
+		String endpointHostname =
+			res.getProperty(propAdapterHostname).getObject().asLiteral().getString();
 		int endpointPort = res.getProperty(propAdapterPort).getObject().asLiteral().getInt();
 
 		DockerAdapter adapter = new DockerAdapter(this, mod, res);

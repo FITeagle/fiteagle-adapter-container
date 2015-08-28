@@ -64,6 +64,11 @@ public class DockerAdapter extends AbstractAdapter {
 		}
 	}
 
+	/**
+	 * Connect to a Docker API endpoint.
+	 * @param hostname Endpoint hostname
+	 * @param port Port number
+	 */
 	public void connect(String hostname, int port) {
 		// Instantiate docker client
 		logger.info("Docker API at " + hostname + ":" + port);
@@ -77,10 +82,7 @@ public class DockerAdapter extends AbstractAdapter {
 		} catch (DockerException e) {
 			adapterABox.addProperty(Omn_lifecycle.hasState, Omn_lifecycle.Failure);
 			logger.severe("Failed to get version information");
-
-			StringWriter strwr = new StringWriter();
-			e.printStackTrace(new PrintWriter(strwr));
-			logger.severe(strwr.toString());
+			logger.severe(e.toString());
 		}
 	}
 
@@ -88,6 +90,13 @@ public class DockerAdapter extends AbstractAdapter {
 		return client;
 	}
 
+	/**
+	 * Create a new instance.
+	 * @param instanceURI Resource identifier
+	 * @param resourceModel Description
+	 * @throws ProcessingException
+	 * @throws InvalidRequestException
+	 */
 	@Override
 	public Model createInstance(String instanceURI, Model resourceModel)
 		throws ProcessingException, InvalidRequestException
@@ -104,6 +113,13 @@ public class DockerAdapter extends AbstractAdapter {
 		return container.serializeModel();
 	}
 
+	/**
+	 * Update an instance.
+	 * @param instanceURI Resource identifier.
+	 * @param resourceModel New description
+	 * @throws InvalidRequestException
+	 * @throws ProcessingException
+	 */
 	@Override
 	public Model updateInstance(String instanceURI, Model resourceModel)
 		throws InvalidRequestException, ProcessingException
@@ -117,6 +133,13 @@ public class DockerAdapter extends AbstractAdapter {
 		return container.serializeModel();
 	}
 
+	/**
+	 * Delete an instance.
+	 * @param instanceURI Resource identifier
+	 * @throws InstanceNotFoundException
+	 * @throws InvalidRequestException
+	 * @throws ProcessingException
+	 */
 	@Override
 	public void deleteInstance(String instanceURI)
 		throws InstanceNotFoundException, InvalidRequestException, ProcessingException
@@ -130,6 +153,11 @@ public class DockerAdapter extends AbstractAdapter {
 		instances.remove(instanceURI);
 	}
 
+	/**
+	 * Describe all instances.
+	 * @throws InstanceNotFoundException
+	 * @throws ProcessingException
+	 */
 	@Override
 	public Model getAllInstances()
 		throws InstanceNotFoundException, ProcessingException
@@ -142,6 +170,13 @@ public class DockerAdapter extends AbstractAdapter {
 		return modelInstances;
 	}
 
+	/**
+	 * Describe a single instance.
+	 * @param instanceURI Instance identifier
+	 * @throws InstanceNotFoundException
+	 * @throws ProcessingException
+	 * @throws InvalidRequestException
+	 */
 	@Override
 	public Model getInstance(String instanceURI)
 		throws InstanceNotFoundException, ProcessingException, InvalidRequestException

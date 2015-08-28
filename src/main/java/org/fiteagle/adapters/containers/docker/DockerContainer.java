@@ -25,15 +25,46 @@ public class DockerContainer {
 	private String instanceIdentifier;
 
 	private enum State {
-		Dead,       // Empty
-		Failed,     // Create/Start failed
-		Active      // Create/Start succeeded
+		/**
+		 * No container is managed by this handle
+		 */
+		Dead,
+
+		/**
+		 * Error during creation or start up
+		 */
+		Failed,
+
+		/**
+		 * Container has been started and is managed by this handle
+		 */
+		Active
 	}
 
+	/**
+	 * State of this container handle
+	 */
 	private State containerState = State.Dead;
+
+	/**
+	 * Managed container ID
+	 * @note This is also part of the state. In case `containerID` is not `null`: there is a
+	 *        container managed by this handle.
+	 */
 	private String containerID = null;
+
+	/**
+	 * Container configuration
+	 * @note The entire configuration is regenerated each time an update request is received.
+	 */
 	private ContainerConfiguration containerConf = null;
 
+	/**
+	 * Instantiate a new container handle.
+	 * @param parent Which adapter manages this resource
+	 * @param uri Resource URI
+	 * @param resource Container class description
+	 */
 	public DockerContainer(
 		DockerAdapter parent,
 		String uri,
@@ -46,17 +77,25 @@ public class DockerContainer {
 		adapterResource = resource;
 	}
 
+	/**
+	 * Process an update request.
+	 * @param newState New description of this resource
+	 */
 	public void update(Resource newState) {
 		logger.info("Received update request");
 		configureFromResource(newState);
 		handleState();
 	}
 
+	/**
+	 * Process the newly set state and configuration. Make happen what is requested.
+	 */
 	private void handleState() {
-		if (containerID != null) {
+		// In case there is a managed container attach to this handle
+		if (containerID != null)
 			delete();
-		}
 
+		// No configuration, no container
 		if (containerConf == null) {
 			containerState = State.Dead;
 			return;
@@ -68,7 +107,10 @@ public class DockerContainer {
 
 			// TODO: Check if requested container image is available on the host
 
+			// Create container
 			containerID = adapter.getDockerClient().create(containerConf);
+
+			// Start container
 			containerState =
 				adapter.getDockerClient().start(containerID)
 					? State.Active
@@ -84,7 +126,7 @@ public class DockerContainer {
 			try {
 				adapter.getDockerClient().delete(containerID, true, true);
 			} catch (DockerException e) {
-				logger.throwing(DockerClient.class.getName(), "delete", e);
+				logger.severe(e.toString());
 			}
 		}
 
@@ -92,6 +134,11 @@ public class DockerContainer {
 		containerState = State.Dead;
 	}
 
+	/**
+	 * Extract a list of strings from a RDF list.
+	 * @param output Elements are appended to this list
+	 * @param head Head element
+	 */
 	private static void extractStringList(List<String> output, Resource head) {
 		if (head == null)
 			return;
@@ -103,6 +150,12 @@ public class DockerContainer {
 			extractStringList(output, head.getProperty(RDF.rest).getObject().asResource());
 	}
 
+	/**
+	 * Build a RDF list from a given array of strings.
+	 * @param model Target model
+	 * @param i Start element index
+	 * @param list Source list
+	 */
 	private static Resource makeStringList(Model model, int i, String[] list) {
 		if (i == list.length - 1) {
 			Resource res = model.createResource(AnonId.create());
@@ -123,6 +176,10 @@ public class DockerContainer {
 		}
 	}
 
+	/**
+	 * Extract information from the resource description and generate a container configuration.
+	 * @param newState Resource description
+	 */
 	private void configureFromResource(Resource newState) {
 		containerConf = new ContainerConfiguration(null, null);
 
@@ -146,8 +203,11 @@ public class DockerContainer {
 				String[] commands = new String[listOut.size()];
 				listOut.toArray(commands);
 
+				// TODO: Log commands
+
 				containerConf.setCommand(commands);
 			} else if (commandHead.isLiteral()) {
+				logger.info("Command = " + containerConf.image);
 				containerConf.setCommandEasily(commandHead.asLiteral().getString());
 			}
 		}
@@ -174,6 +234,9 @@ public class DockerContainer {
 		}
 	}
 
+	/**
+	 * Generate a resource description based off the current resource state.
+	 */
 	public Model serializeModel() {
 		Model responseModel = ModelFactory.createDefaultModel();
 		Resource resource = responseModel.createResource(instanceIdentifier);

@@ -148,7 +148,6 @@ public class RequestBuilder {
 
 		request.addHeader("Content-Type", "application/json");
 
-		// TODO: Add start configuration
 		request.setEntity(new StringEntity("{}"));
 
 		return request;

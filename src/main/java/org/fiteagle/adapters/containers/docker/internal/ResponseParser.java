@@ -14,6 +14,11 @@ import com.google.gson.JsonPrimitive;
  * Parse HTTP responses according to the expected result type.
  */
 public abstract class ResponseParser {
+	/**
+	 * Extract a base64 Container ID.
+	 * @param jsonContainerID JSON element containing the ID
+	 * @throws DockerException
+	 */
 	public static String extractContainerID(JsonElement jsonContainerID)
 		throws DockerException
 	{
