@@ -1,0 +1,3 @@
+org.fiteagle.adapters.containers
+org.fiteagle.adapters.containers.docker
+org.fiteagle.adapters.containers.docker.internal
