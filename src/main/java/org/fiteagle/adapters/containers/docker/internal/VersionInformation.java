@@ -52,7 +52,6 @@ public class VersionInformation {
 	/**
 	 * Parse a JSON object containing version information.
 	 * @param asJsonObject
-	 * @return
 	 */
 	public static VersionInformation fromJSON(JsonObject asJsonObject) {
 		return new VersionInformation(
