@@ -3,7 +3,7 @@ jdk:
 - oraclejdk8
 sudo: false
 script:
-- travis_retry mvn clean compile test install site
+- travis_retry mvn clean compile test
 - mvn exec:java -Dexec.mainClass=org.fiteagle.adapters.containers.Playground -Dexec.classpathScope=test
 notifications:
   slack:
