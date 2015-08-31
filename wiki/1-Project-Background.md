@@ -1,7 +1,7 @@
 ## FITeagle
 The FITeagle system provides a large, flexible and well described environment for internet testbeds. These testbeds exist to evolve existing mechanism of the internet and to test and develop new ideas of the future internet. Many insitutions started to set up their own testbeds and used different protocols to do so but since the internet spans over the entire world it is desirable to connect these. The FITeagle system tries to connect these with its federation mechanism and a set of standardized mechanisms and protocols. The federation mechanism of the FITeagle system has interfaces that can speak the different protocols of the many connected systems enabling larger test and experiments. FITeagle iself has been deveolped by a working group at the AV chair of TU Berlin. It was implemented during a project by Franco Hermann, Volker Jung and Leonhard Palm.
 
-![Fig. 1](https://owncloud.tu-berlin.de/index.php/apps/files_sharing/ajax/publicpreview.php?x=1899&y=1015&a=true&file=firma-img-1.png&t=a243bdcf533ec960d86f65e96b6d158a&scalingup=0)
+![Fig. 1](firma-img-1.png)
 
 ## Docker
 Docker is a Lightweight Virtualization Solution developed as an open source project and managed by Docker, Inc. Docker was started by dotCloud, Inc. in March 2013 (the first github commit) as the deployment engine which ran their dotCloud PaaS software. In October 2013 dotCloud, Inc changed its name to Docker, Inc., and later on in 2014 it sold its dotCloud PaaS, to focus solemnly on Docker. Docker is a tool to build, run and manage containers, Docker Inc. is also providing the Docker Hub which is a registry for container images.
