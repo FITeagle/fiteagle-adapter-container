@@ -1,0 +1,15 @@
+language: java
+jdk:
+- oraclejdk8
+sudo: false
+script:
+- travis_retry mvn clean compile test install site
+- mvn exec:java -Dexec.mainClass=org.fiteagle.adapters.containers.Playground -Dexec.classpathScope=test
+notifications:
+  slack:
+    secure: Uoto+e3CC9q3ukbfOn2FMU4ifu0Uqn/Njqcf5dtKa15a8hf9FwBgzZWDYuyidhpR7+9wDGQXoEzI9dQJG8zh5YL4bCqXTgRgLPiZLKYAV/hT3V3H6DKXhoskbhR7mPm4RNBaeb1yhaCKmSNwH+YN7Z4N5LzISi+DZpSczb/sO/sGG30wTzSaRKMPpeCkDiXuVJvUw7k+lxqzQejFeuIT/wnsgplFSlId2UOyAM1/q8LhAnx/bgPvPbxDtULl0SPRcpDigiIjVReVoFyo93vIqwzsBX/zNSp84F4Eukpp7OraRDsJzJg6+uNq1z1tqOZMenmfDpZmaX9C9Ck0hjIrUptCt8iduIs1+VNIrlHS4V6hBQu+9ipAOF7Pu3zKCxg5l/eRSLlAp5FTEg4i3aZUWe1EXkUWwYvM2ueYCVi/XURL1KQdN9x3n3PyMOESRSO3TlwhlcxgcAHcKGoJ+UVZvkhbdsi7txvfDlJfTsXZCGE+bCRy3b9KxnDD+CzkP+f/S8QwXvX97l7Nc1JCml1XId0Rrh/tp4wZAwZKXnIabq9UyRwYE/XkRUNuTfRZDNNAMBRHC6IZDBWHKbh7+w7ti9O8tdqsnqyiRZPEotsfS2YPNjvUYpEQJTDbYhh/GlBy2pGs3y78AFTUQy/GaQuYovWv2v4FJPR/D+4cAnH4Ov4=
+  email:
+  - fiteagle.dev@av.tu-berlin.de
+cache:
+  directories:
+  - $HOME/.m2
