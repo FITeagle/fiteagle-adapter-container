@@ -9,3 +9,4 @@ Compile tests
 Execute tests
 	
 	$ mvn exec:java -Dexec.mainClass=org.fiteagle.adapters.containers.Playground -Dexec.classpathScope=test
+
